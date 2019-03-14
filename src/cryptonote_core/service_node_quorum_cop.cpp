@@ -33,7 +33,7 @@
 #include "cryptonote_core.h"
 #include "version.h"
 
-#include "common/loki_integration_test_hooks.h"
+#include "common/sevabit_integration_test_hooks.h"
 
 #undef SEVABIT_DEFAULT_LOG_CATEGORY
 #define SEVABIT_DEFAULT_LOG_CATEGORY "quorum_cop"
@@ -107,7 +107,7 @@ namespace service_nodes
       const std::shared_ptr<const quorum_state> state = m_core.get_quorum_state(m_last_height);
       if (!state)
       {
-        // TODO(loki): Fatal error
+        // TODO(sevabit): Fatal error
         LOG_ERROR("Quorum state for height: " << m_last_height << "was not cached in daemon!");
         continue;
       }

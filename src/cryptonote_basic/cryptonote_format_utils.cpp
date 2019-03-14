@@ -1116,7 +1116,7 @@ namespace cryptonote
     switch (decimal_point)
     {
       case 9:
-        return "loki";
+        return "sevabit";
       case 6:
         return "megarok";
       case 3:

@@ -31,7 +31,7 @@
 
 #include <string>
 
-namespace loki
+namespace sevabit
 {
 double      round           (double);
 double      exp2            (double);

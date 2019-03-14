@@ -667,7 +667,7 @@ TEST(Serialization, serializes_ringct_types)
   ASSERT_TRUE(blob == blob2);
 }
 
-// TODO(loki): These tests are broken because they rely on testnet which has
+// TODO(sevabit): These tests are broken because they rely on testnet which has
 // since been restarted, and so the genesis block of these predefined wallets
 // are broken
 //             - 2019-02-25 Doyle
@@ -951,11 +951,11 @@ inline void serialize(Archive &a, unsigned_tx_set &x, const boost::serialization
 }
 TEST(Serialization, portability_unsigned_tx)
 {
-  // TODO(loki): We updated testnet genesis, is broken
+  // TODO(sevabit): We updated testnet genesis, is broken
   const bool restricted = false;
   tools::wallet2 w(cryptonote::TESTNET, restricted);
 
-  const boost::filesystem::path filename    = unit_test::data_dir / "unsigned_loki_tx";
+  const boost::filesystem::path filename    = unit_test::data_dir / "unsigned_sevabit_tx";
   const boost::filesystem::path wallet_file = unit_test::data_dir / "wallet_testnet";
   const string password = "test";
   w.load(wallet_file.string(), password);
@@ -1154,7 +1154,7 @@ TEST(Serialization, portability_signed_tx)
   const bool restricted = false;
   tools::wallet2 w(cryptonote::TESTNET, restricted);
 
-  const boost::filesystem::path filename    = unit_test::data_dir / "signed_loki_tx";
+  const boost::filesystem::path filename    = unit_test::data_dir / "signed_sevabit_tx";
   const boost::filesystem::path wallet_file = unit_test::data_dir / "wallet_testnet";
   const string password = "test";
   w.load(wallet_file.string(), password);

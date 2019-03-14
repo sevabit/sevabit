@@ -224,12 +224,12 @@ void mlog_configure(const std::string &filename_base, bool console, const std::s
     }
   });
   mlog_set_common_prefix();
-  const char *loki_log = getenv("SEVABIT_LOGS");
-  if (!loki_log)
+  const char *sevabit_log = getenv("SEVABIT_LOGS");
+  if (!sevabit_log)
   {
-    loki_log = get_default_categories(0);
+    sevabit_log = get_default_categories(0);
   }
-  mlog_set_log(loki_log);
+  mlog_set_log(sevabit_log);
 #ifdef WIN32
   EnableVTMode();
 #endif

@@ -19,7 +19,7 @@
 #include "command_line.h"
 #include "shoom.h"
 
-namespace loki
+namespace sevabit
 {
 struct fixed_buffer
 {
@@ -41,7 +41,7 @@ extern const command_line::arg_descriptor<std::string, false> arg_integration_te
 extern boost::mutex integration_test_mutex;
 extern bool core_is_idle;
 
-}; // namespace loki
+}; // namespace sevabit
 
 #endif // SEVABIT_INTEGRATION_TEST_HOOKS_H
 
@@ -70,7 +70,7 @@ static sem_t              *global_stdout_semaphore_handle;
 static sem_t              *global_stdout_ready_semaphore;
 static sem_t              *global_stdin_ready_semaphore;
 
-namespace loki
+namespace sevabit
 {
 bool core_is_idle;
 const command_line::arg_descriptor<std::string, false> arg_integration_test_hardforks_override = {
@@ -83,23 +83,23 @@ const command_line::arg_descriptor<std::string, false> arg_integration_test_hard
 const command_line::arg_descriptor<std::string, false> arg_integration_test_shared_mem_name = {
   "integration-test-shared-mem-name"
 , "Specify the shared memory base name for stdin, stdout and semaphore name"
-, "loki-default-integration-test-mem-name"
+, "sevabit-default-integration-test-mem-name"
 , false
 };
 
 boost::mutex integration_test_mutex;
 
-} // namespace loki
+} // namespace sevabit
 
 std::string global_stdin_semaphore_name;
 std::string global_stdout_semaphore_name;
 std::string global_stdout_ready_semaphore_name;
 std::string global_stdin_ready_semaphore_name;
 
-void loki::use_standard_cout()   { if (!global_std_cout) { global_std_cout = std::cout.rdbuf(); } std::cout.rdbuf(global_std_cout); }
-void loki::use_redirected_cout() { if (!global_std_cout) { global_std_cout = std::cout.rdbuf(); } std::cout.rdbuf(global_redirected_cout.rdbuf()); }
+void sevabit::use_standard_cout()   { if (!global_std_cout) { global_std_cout = std::cout.rdbuf(); } std::cout.rdbuf(global_std_cout); }
+void sevabit::use_redirected_cout() { if (!global_std_cout) { global_std_cout = std::cout.rdbuf(); } std::cout.rdbuf(global_redirected_cout.rdbuf()); }
 
-void loki::init_integration_test_context(const std::string &base_name)
+void sevabit::init_integration_test_context(const std::string &base_name)
 {
   assert(base_name.size() > 0);
 
@@ -153,7 +153,7 @@ void loki::init_integration_test_context(const std::string &base_name)
       global_stdout_ready_semaphore_name.c_str());
 }
 
-void loki::deinit_integration_test_context()
+void sevabit::deinit_integration_test_context()
 {
   sem_unlink(global_stdin_semaphore_name.c_str());
   sem_unlink(global_stdout_semaphore_name.c_str());
@@ -204,7 +204,7 @@ static char *parse_message(char *msg_buf, int msg_buf_len)
   return ptr;
 }
 
-std::vector<std::string> loki::separate_stdin_to_space_delim_args(loki::fixed_buffer const *cmd)
+std::vector<std::string> sevabit::separate_stdin_to_space_delim_args(sevabit::fixed_buffer const *cmd)
 {
   std::vector<std::string> args;
   char const *start = cmd->data;
@@ -227,7 +227,7 @@ std::vector<std::string> loki::separate_stdin_to_space_delim_args(loki::fixed_bu
   return args;
 }
 
-loki::fixed_buffer loki::read_from_stdin_shared_mem()
+sevabit::fixed_buffer sevabit::read_from_stdin_shared_mem()
 {
   boost::unique_lock<boost::mutex> scoped_lock(integration_test_mutex);
 
@@ -261,7 +261,7 @@ loki::fixed_buffer loki::read_from_stdin_shared_mem()
   return result;
 }
 
-void loki::write_redirected_stdout_to_shared_mem()
+void sevabit::write_redirected_stdout_to_shared_mem()
 {
   boost::unique_lock<boost::mutex> scoped_lock(integration_test_mutex);
 

@@ -197,14 +197,14 @@ RUN set -ex && \
 COPY --from=builder /src/build/release/bin /usr/local/bin/
 
 # Contains the blockchain
-VOLUME /root/.loki
+VOLUME /root/.sevabit
 
 # Generate your wallet via accessing the container and run:
 # cd /wallet
-# loki-wallet-cli
+# sevabit-wallet-cli
 VOLUME /wallet
 
 EXPOSE 22020
 EXPOSE 22020
 
-ENTRYPOINT ["lokid", "--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=22022", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=22023", "--non-interactive", "--confirm-external-bind"]
+ENTRYPOINT ["sevabitd", "--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=22022", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=22023", "--non-interactive", "--confirm-external-bind"]

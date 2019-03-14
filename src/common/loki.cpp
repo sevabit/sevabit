@@ -1,4 +1,4 @@
-#include "loki.h"
+#include "sevabit.h"
 #include <assert.h>
 
 /* Exponential base 2 function.
@@ -26,7 +26,7 @@
 #include <algorithm>
 #include <vector>
 
-// TODO(loki): This is temporary until we switch to integer math for calculating
+// TODO(sevabit): This is temporary until we switch to integer math for calculating
 // block rewards. We provide the specific implementation to minimise the risk of
 // different results from math functions across different std libraries.
 static_assert(std::numeric_limits<double>::is_iec559, "We require IEEE standard compliant doubles.");
@@ -44,7 +44,7 @@ static_assert(std::numeric_limits<double>::is_iec559, "We require IEEE standard 
 #define LOG2_BY_256_INVERSE 369.329930467574632284140718336484387181
 
 double
-loki::exp2(double x)
+sevabit::exp2(double x)
 {
   /* exp2(x) = exp(x*log(2)).
      If we would compute it like this, there would be rounding errors for
@@ -98,7 +98,7 @@ loki::exp2(double x)
        truncate the series after the z^5 term.  */
 
   {
-    double nm = loki::round (x * 256.0); /* = 256 * n + m */
+    double nm = sevabit::round (x * 256.0); /* = 256 * n + m */
     double z = (x * 256.0 - nm) * (LOG2_BY_256 * 0.5);
 
 /* Coefficients of the power series for tanh(z).  */
@@ -120,7 +120,7 @@ loki::exp2(double x)
 
     double exp_y = (1.0 + tanh_z) / (1.0 - tanh_z);
 
-    int n = (int) loki::round (nm * (1.0 / 256.0));
+    int n = (int) sevabit::round (nm * (1.0 / 256.0));
     int m = (int) nm - 256 * n;
 
     /* exp_table[i] = exp((i - 128) * log(2)/256).
@@ -438,7 +438,7 @@ loki::exp2(double x)
 #endif
 
 double
-loki::round (double x)
+sevabit::round (double x)
 {
   /* 2^(DBL_MANT_DIG-1).  */
   static const double TWO_MANT_DIG =
@@ -556,7 +556,7 @@ constexpr uint8_t hexpair_to_byte(const char & hi, const char & lo)
   return hex_to_nibble(hi) << 4 | hex_to_nibble(lo);
 }
 
-std::string loki::hex64_to_base32z(const std::string &src)
+std::string sevabit::hex64_to_base32z(const std::string &src)
 {
   assert(src.size() <= 64); // NOTE: Developer error, update function if you need more. This is intended for 64 char snode pubkeys
   // decode to binary

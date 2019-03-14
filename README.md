@@ -1,7 +1,7 @@
 # Sevabit
 
 <p align="center">
-    <a href="https://github.com/loki-project/loki/commits/dev"><img alt="pipeline status" src="https://gitlab.com/lokiproject/loki/badges/dev/pipeline.svg" /></a>
+    <a href="https://github.com/sevabit/sevabit/commits/dev"><img alt="pipeline status" src="https://gitlab.com/sevabitproject/sevabit/badges/dev/pipeline.svg" /></a>
 </p>
 
 Copyright (c) 2018 The Sevabit Project.   
@@ -10,15 +10,15 @@ Portions Copyright (c) 2012-2013 The Cryptonote developers.
 
 ## Development resources
 
-- Web: [loki.network](https://loki.network)
+- Web: [sevabit.network](https://sevabit.network)
 - Telegram: [t.me/SevabitCommunity](https://t.me/SevabitCommunity)
-- Mail: [team@loki.network](mailto:team@loki.network)
-- GitHub: [https://github.com/loki-project/loki](https://github.com/loki-project/loki)
+- Mail: [team@sevabit.network](mailto:team@sevabit.network)
+- GitHub: [https://github.com/sevabit/sevabit](https://github.com/sevabit/sevabit)
 - Discord: [https://discord.gg/67GXfD6](https://discord.gg/67GXfD6)
 
 ## Vulnerability disclosure
 
-- Check out our [Vulnerability Response Process](https://loki-project.github.io/loki-docs/Contributing/VULNERABILITY_RESPONSE_SEVABIT), encourages prompt disclosure of any Vulnerabilities
+- Check out our [Vulnerability Response Process](https://sevabit.github.io/sevabit-docs/Contributing/VULNERABILITY_RESPONSE_SEVABIT), encourages prompt disclosure of any Vulnerabilities
 
 ## Information
 
@@ -26,7 +26,7 @@ Sevabit is a private cryptocurrency based on Monero. Sevabit currently offers an
 
 More information on the project can be found on the website and in the whitepaper.
 
-Sevabit is an open source project, and we encourage contributions from anyone with something to offer. For more information on contributing, please contact team@loki.network
+Sevabit is an open source project, and we encourage contributions from anyone with something to offer. For more information on contributing, please contact team@sevabit.network
 
 ## Compiling Sevabit from source
 
@@ -74,11 +74,11 @@ Debian / Ubuntu one liner for all dependencies
 
 Clone recursively to pull-in needed submodule(s):
 
-`$ git clone --recursive https://github.com/loki-project/loki`
+`$ git clone --recursive https://github.com/sevabit/sevabit`
 
 If you already have a repo cloned, initialize and update:
 
-`$ cd loki && git submodule init && git submodule update`
+`$ cd sevabit && git submodule init && git submodule update`
 
 ### Build instructions
 
@@ -90,7 +90,7 @@ invokes cmake commands as needed.
 * Install the dependencies
 * Change to the root of the source code directory, change to the most recent release branch, and build:
 
-        cd loki
+        cd sevabit
         git checkout master
         make
 
@@ -110,9 +110,9 @@ invokes cmake commands as needed.
 
 * The resulting executables can be found in `build/release/bin`
 
-* Add `PATH="$PATH:$HOME/loki/build/release/bin"` to `.profile`
+* Add `PATH="$PATH:$HOME/sevabit/build/release/bin"` to `.profile`
 
-* Run Sevabit with `lokid --detach`
+* Run Sevabit with `sevabitd --detach`
 
 * **Optional**: build and run the test suite to verify the binaries:
 
@@ -151,10 +151,10 @@ Tested on a Raspberry Pi Zero with a clean install of minimal Raspbian Stretch (
 ```
 * If using an external hard disk without an external power supply, ensure it gets enough power to avoid hardware issues when syncing, by adding the line "max_usb_current=1" to /boot/config.txt
 
-* Clone loki and checkout most recent release version:
+* Clone sevabit and checkout most recent release version:
 ```
-        git clone https://github.com/loki-project/loki.git
-	cd loki
+        git clone https://github.com/sevabit/sevabit.git
+	cd sevabit
 	git checkout master
 ```
 * Build:
@@ -165,9 +165,9 @@ Tested on a Raspberry Pi Zero with a clean install of minimal Raspbian Stretch (
 
 * The resulting executables can be found in `build/release/bin`
 
-* Add `PATH="$PATH:$HOME/loki/build/release/bin"` to `.profile`
+* Add `PATH="$PATH:$HOME/sevabit/build/release/bin"` to `.profile`
 
-* Run Sevabit with `lokid --detach`
+* Run Sevabit with `sevabitd --detach`
 
 * You may wish to reduce the size of the swap file after the build has finished, and delete the boost directory from your home directory
 
@@ -201,7 +201,7 @@ If you are using the older Raspbian Jessie image, compiling Sevabit is a bit mor
 ```
 * Wait ~4 hours
 
-* From here, follow the [general Raspberry Pi instructions](#on-the-raspberry-pi) from the "Clone loki and checkout most recent release version" step.
+* From here, follow the [general Raspberry Pi instructions](#on-the-raspberry-pi) from the "Clone sevabit and checkout most recent release version" step.
 
 #### On Windows:
 
@@ -244,7 +244,7 @@ application.
 
 * To git clone, run:
 
-        git clone --recursive https://github.com/loki-project/loki.git
+        git clone --recursive https://github.com/sevabit/sevabit.git
 
 **Building**
 
@@ -252,7 +252,7 @@ application.
 	
         cd git
 
-* If you would like a specific [version/tag](https://github.com/loki-project/loki/tags), do a git checkout for that version. eg. 'v2.0.3'. If you dont care about the version and just want binaries from master, skip this step:
+* If you would like a specific [version/tag](https://github.com/sevabit/sevabit/tags), do a git checkout for that version. eg. 'v2.0.3'. If you dont care about the version and just want binaries from master, skip this step:
 	
         git checkout v2.0.3
 
@@ -278,7 +278,7 @@ application.
 
 ### On FreeBSD:
 
-The project can be built from scratch by following instructions for Linux above. If you are running loki in a jail you need to add the flag: `allow.sysvipc=1` to your jail configuration, otherwise lmdb will throw the error message: `Failed to open lmdb environment: Function not implemented`.
+The project can be built from scratch by following instructions for Linux above. If you are running sevabit in a jail you need to add the flag: `allow.sysvipc=1` to your jail configuration, otherwise lmdb will throw the error message: `Failed to open lmdb environment: Function not implemented`.
 
 ### On OpenBSD:
 
@@ -366,7 +366,7 @@ cmake ..
 doas make install
 ```
 
-Build loki: `env DEVELOPER_LOCAL_TOOLS=1 BOOST_ROOT=/usr/local make release-static`
+Build sevabit: `env DEVELOPER_LOCAL_TOOLS=1 BOOST_ROOT=/usr/local make release-static`
 
 #### OpenBSD >= 6.4
 
@@ -399,13 +399,13 @@ Then you can run make as usual.
 ### On Linux for Android (using docker):
 
         # Build image (for ARM 32-bit)
-        docker build -f utils/build_scripts/android32.Dockerfile -t loki-android .
+        docker build -f utils/build_scripts/android32.Dockerfile -t sevabit-android .
         # Build image (for ARM 64-bit)
-        docker build -f utils/build_scripts/android64.Dockerfile -t loki-android .
+        docker build -f utils/build_scripts/android64.Dockerfile -t sevabit-android .
         # Create container
-        docker create -it --name loki-android loki-android bash
+        docker create -it --name sevabit-android sevabit-android bash
         # Get binaries
-        docker cp loki-android:/src/build/release/bin .
+        docker cp sevabit-android:/src/build/release/bin .
 
 ### Building portable statically linked binaries
 
@@ -442,29 +442,29 @@ The produced binaries still link libc dynamically. If the binary is compiled on 
 * Docker
 
         # Build using all available cores
-        docker build -t loki .
+        docker build -t sevabit .
 
         # or build using a specific number of cores (reduce RAM requirement)
-        docker build --build-arg NPROC=1 -t loki .
+        docker build --build-arg NPROC=1 -t sevabit .
 
         # either run in foreground
-        docker run -it -v /loki/chain:/root/.loki -v /loki/wallet:/wallet -p 22020:22020 loki
+        docker run -it -v /sevabit/chain:/root/.sevabit -v /sevabit/wallet:/wallet -p 22020:22020 sevabit
 
         # or in background
-        docker run -it -d -v /loki/chain:/root/.loki -v /loki/wallet:/wallet -p 22020:22020 loki
+        docker run -it -d -v /sevabit/chain:/root/.sevabit -v /sevabit/wallet:/wallet -p 22020:22020 sevabit
 
 * The build needs 3 GB space.
 * Wait one  hour or more
 
-## Running lokid
+## Running sevabitd
 
 The build places the binary in `bin/` sub-directory within the build directory
 from which cmake was invoked (repository root by default). To run in
 foreground:
 
-    ./bin/lokid
+    ./bin/sevabitd
 
-To list all available options, run `./bin/lokid --help`.  Options can be
+To list all available options, run `./bin/sevabitd --help`.  Options can be
 specified either on the command line or in a configuration file passed by the
 `--config-file` argument.  To specify an option in the configuration file, add
 a line with the syntax `argumentname=value`, where `argumentname` is the name
@@ -472,7 +472,7 @@ of the argument without the leading dashes, for example `log-level=1`.
 
 To run in background:
 
-    ./bin/lokid --log-file lokid.log --detach
+    ./bin/sevabitd --log-file sevabitd.log --detach
 
 ## Internationalization
 
@@ -484,27 +484,27 @@ While Sevabit isn't made to integrate with Tor, it can be used wrapped with tors
 setting the following configuration parameters and environment variables:
 
 * `--p2p-bind-ip 127.0.0.1` on the command line or `p2p-bind-ip=127.0.0.1` in
-  lokid.conf to disable listening for connections on external interfaces.
-* `--no-igd` on the command line or `no-igd=1` in lokid.conf to disable IGD
+  sevabitd.conf to disable listening for connections on external interfaces.
+* `--no-igd` on the command line or `no-igd=1` in sevabitd.conf to disable IGD
   (UPnP port forwarding negotiation), which is pointless with Tor.
 * `DNS_PUBLIC=tcp` or `DNS_PUBLIC=tcp://x.x.x.x` where x.x.x.x is the IP of the
   desired DNS server, for DNS requests to go over TCP, so that they are routed
-  through Tor. When IP is not specified, lokid uses the default list of
+  through Tor. When IP is not specified, sevabitd uses the default list of
   servers defined in [src/common/dns_utils.cpp](src/common/dns_utils.cpp).
-* `TORSOCKS_ALLOW_INBOUND=1` to tell torsocks to allow lokid to bind to interfaces
+* `TORSOCKS_ALLOW_INBOUND=1` to tell torsocks to allow sevabitd to bind to interfaces
    to accept connections from the wallet. On some Linux systems, torsocks
    allows binding to localhost by default, so setting this variable is only
    necessary to allow binding to local LAN/VPN interfaces to allow wallets to
    connect from remote hosts. On other systems, it may be needed for local wallets
    as well.
 * Do NOT pass `--detach` when running through torsocks with systemd, (see
-  [utils/systemd/lokid.service](utils/systemd/lokid.service) for details).
+  [utils/systemd/sevabitd.service](utils/systemd/sevabitd.service) for details).
 * If you use the wallet with a Tor daemon via the loopback IP (eg, 127.0.0.1:9050),
   then use `--untrusted-daemon` unless it is your own hidden service.
 
-Example command line to start lokid through Tor:
+Example command line to start sevabitd through Tor:
 
-    DNS_PUBLIC=tcp torsocks lokid --p2p-bind-ip 127.0.0.1 --no-igd
+    DNS_PUBLIC=tcp torsocks sevabitd --p2p-bind-ip 127.0.0.1 --no-igd
 
 ### Using Tor on Tails
 
@@ -513,7 +513,7 @@ to add a rule to allow this connection too, in addition to telling torsocks to
 allow inbound connections. Full example:
 
     sudo iptables -I OUTPUT 2 -p tcp -d 127.0.0.1 -m tcp --dport 18081 -j ACCEPT
-    DNS_PUBLIC=tcp torsocks ./lokid --p2p-bind-ip 127.0.0.1 --no-igd --rpc-bind-ip 127.0.0.1 \
+    DNS_PUBLIC=tcp torsocks ./sevabitd --p2p-bind-ip 127.0.0.1 --no-igd --rpc-bind-ip 127.0.0.1 \
         --data-dir /home/amnesia/Persistent/your/directory/to/the/blockchain
 
 ## Debugging
@@ -531,7 +531,7 @@ Run the build.
 Once it stalls, enter the following command:
 
 ```
-gdb /path/to/lokid `pidof lokid`
+gdb /path/to/sevabitd `pidof sevabitd`
 ```
 
 Type `thread apply all bt` within gdb in order to obtain the stack trace
@@ -544,21 +544,21 @@ Enter `echo core | sudo tee /proc/sys/kernel/core_pattern` to stop cores from be
 
 Run the build.
 
-When it terminates with an output along the lines of "Segmentation fault (core dumped)", there should be a core dump file in the same directory as lokid. It may be named just `core`, or `core.xxxx` with numbers appended.
+When it terminates with an output along the lines of "Segmentation fault (core dumped)", there should be a core dump file in the same directory as sevabitd. It may be named just `core`, or `core.xxxx` with numbers appended.
 
 You can now analyse this core dump with `gdb` as follows:
 
-`gdb /path/to/lokid /path/to/dumpfile`
+`gdb /path/to/sevabitd /path/to/dumpfile`
 
 Print the stack trace with `bt`
 
-* To run loki within gdb:
+* To run sevabit within gdb:
 
-Type `gdb /path/to/lokid`
+Type `gdb /path/to/sevabitd`
 
 Pass command-line options with `--args` followed by the relevant arguments
 
-Type `run` to run lokid
+Type `run` to run sevabitd
 
 ### Analysing memory corruption
 
@@ -570,11 +570,11 @@ Configure Sevabit with the -D SANITIZE=ON cmake flag, eg:
 
     cd build/debug && cmake -D SANITIZE=ON -D CMAKE_BUILD_TYPE=Debug ../..
 
-You can then run the loki tools normally. Performance will typically halve.
+You can then run the sevabit tools normally. Performance will typically halve.
 
 * valgrind
 
-Install valgrind and run as `valgrind /path/to/lokid`. It will be very slow.
+Install valgrind and run as `valgrind /path/to/sevabitd`. It will be very slow.
 
 ### LMDB
 
@@ -582,7 +582,7 @@ Instructions for debugging suspected blockchain corruption as per @HYC
 
 There is an `mdb_stat` command in the LMDB source that can print statistics about the database but it's not routinely built. This can be built with the following command:
 
-`cd ~/loki/external/db_drivers/liblmdb && make`
+`cd ~/sevabit/external/db_drivers/liblmdb && make`
 
 The output of `mdb_stat -ea <path to blockchain dir>` will indicate inconsistencies in the blocks, block_heights and block_info table.
 

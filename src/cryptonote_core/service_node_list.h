@@ -164,7 +164,7 @@ namespace service_nodes
   };
 
   template<typename T>
-  void loki_shuffle(std::vector<T>& a, uint64_t seed);
+  void sevabit_shuffle(std::vector<T>& a, uint64_t seed);
 
   class service_node_list
     : public cryptonote::Blockchain::BlockAddedHook,

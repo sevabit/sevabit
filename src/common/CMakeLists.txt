@@ -36,7 +36,7 @@ set(common_sources
   download.cpp
   error.cpp
   expect.cpp
-  loki.cpp
+  sevabit.cpp
   util.cpp
   i18n.cpp
   rules.cpp
@@ -71,9 +71,9 @@ set(common_private_headers
   download.h
   error.h
   expect.h
-  loki.h
+  sevabit.h
   http_connection.h
-  loki_integration_test_hooks.h
+  sevabit_integration_test_hooks.h
   notify.h
   pod-class.h
   pruning.h
@@ -93,9 +93,9 @@ set(common_private_headers
   aligned.h
   combinator.h)
 
-loki_private_headers(common
+sevabit_private_headers(common
   ${common_private_headers})
-loki_add_library(common
+sevabit_add_library(common
   ${common_sources}
   ${common_headers}
   ${common_private_headers}

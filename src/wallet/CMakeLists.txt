@@ -52,9 +52,9 @@ set(wallet_private_headers
   message_store.h
   message_transporter.h)
 
-loki_private_headers(wallet
+sevabit_private_headers(wallet
   ${wallet_private_headers})
-loki_add_library(wallet
+sevabit_add_library(wallet
   ${wallet_sources}
   ${wallet_private_headers})
 target_link_libraries(wallet
@@ -83,9 +83,9 @@ if (NOT SEVABIT_DAEMON_AND_WALLET_ONLY)
   set(wallet_rpc_private_headers
     wallet_rpc_server.h)
 
-  loki_private_headers(wallet_rpc_server
+  sevabit_private_headers(wallet_rpc_server
     ${wallet_rpc_private_headers})
-  loki_add_executable(wallet_rpc_server
+  sevabit_add_executable(wallet_rpc_server
     ${wallet_rpc_sources}
     ${wallet_rpc_headers}
     ${wallet_rpc_private_headers})
@@ -108,7 +108,7 @@ if (NOT SEVABIT_DAEMON_AND_WALLET_ONLY)
       ${EXTRA_LIBRARIES})
   set_property(TARGET wallet_rpc_server
     PROPERTY
-      OUTPUT_NAME "loki-wallet-rpc")
+      OUTPUT_NAME "sevabit-wallet-rpc")
   install(TARGETS wallet_rpc_server DESTINATION bin)
 endif()
 

@@ -37,7 +37,7 @@ using namespace epee;
 #include "common/command_line.h"
 #include "common/updates.h"
 #include "common/download.h"
-#include "common/loki.h"
+#include "common/sevabit.h"
 #include "common/util.h"
 #include "common/perf_timer.h"
 #include "cryptonote_basic/cryptonote_format_utils.h"
@@ -2057,7 +2057,7 @@ namespace cryptonote
   bool core_rpc_server::on_update(const COMMAND_RPC_UPDATE::request& req, COMMAND_RPC_UPDATE::response& res, const connection_context *ctx)
   {
     PERF_TIMER(on_update);
-    static const char software[] = "loki";
+    static const char software[] = "sevabit";
 #ifdef BUILD_TAG
     static const char buildtag[] = BOOST_PP_STRINGIZE(BUILD_TAG);
     static const char subdir[] = "cli";
@@ -2605,7 +2605,7 @@ namespace cryptonote
     for (const auto& key : keys)
     {
       std::string const hex64 = string_tools::pod_to_hex(key);
-      res.keys[i++]           = loki::hex64_to_base32z(hex64);
+      res.keys[i++]           = sevabit::hex64_to_base32z(hex64);
     }
     return true;
   }

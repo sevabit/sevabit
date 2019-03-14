@@ -2340,7 +2340,7 @@ namespace wallet_rpc
         KV_SERIALIZE_OPT(allow_openalias, false)
       END_KV_SERIALIZE_MAP()
     };
-    // TODO(doyle): FIXME(loki): When the associated commit from upstream Monero is merged
+    // TODO(doyle): FIXME(sevabit): When the associated commit from upstream Monero is merged
     // typedef epee::misc_utils::struct_init<request_t> request;
 
     struct response

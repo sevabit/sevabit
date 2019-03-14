@@ -27,7 +27,7 @@
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef _WIN32
- #define __STDC_FORMAT_MACROS // NOTE(loki): Explicitly define the PRIu64 macro on Mingw
+ #define __STDC_FORMAT_MACROS // NOTE(sevabit): Explicitly define the PRIu64 macro on Mingw
 #endif
 
 #include <boost/algorithm/string.hpp>
@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  mlog_configure(mlog_get_default_log_path("loki-blockchain-prune-known-spent-data.log"), true);
+  mlog_configure(mlog_get_default_log_path("sevabit-blockchain-prune-known-spent-data.log"), true);
   if (!command_line::is_arg_defaulted(vm, arg_log_level))
     mlog_set_log(command_line::get_arg(vm, arg_log_level).c_str());
   else

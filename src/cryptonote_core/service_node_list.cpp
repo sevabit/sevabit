@@ -322,7 +322,7 @@ namespace service_nodes
 
     if (!state)
     {
-      // TODO(loki): Not being able to find a quorum is fatal! We want better caching abilities.
+      // TODO(sevabit): Not being able to find a quorum is fatal! We want better caching abilities.
       MERROR("Quorum state for height: " << deregister.block_height << ", was not stored by the daemon");
       return false;
     }
@@ -414,7 +414,7 @@ namespace service_nodes
     auto all_swarms = get_all_swarms(swarm_to_snodes);
     std::sort(all_swarms.begin(), all_swarms.end());
 
-    loki_shuffle(all_swarms, seed);
+    sevabit_shuffle(all_swarms, seed);
 
     const auto cmp_swarm_sizes =
       [&swarm_to_snodes](swarm_id_t lhs, swarm_id_t rhs) {
@@ -491,7 +491,7 @@ namespace service_nodes
       /// shuffle the queue and select MAX_SWARM_SIZE last elements
       const auto new_swarm_id = get_new_swarm_id(mersenne_twister, all_swarms);
 
-      loki_shuffle(swarm_buffer, seed + new_swarm_id);
+      sevabit_shuffle(swarm_buffer, seed + new_swarm_id);
 
       std::vector<crypto::public_key> selected_snodes;
 
@@ -807,7 +807,7 @@ namespace service_nodes
     int hard_fork_version = m_blockchain.get_hard_fork_version(block_height);
     if (hard_fork_version >= cryptonote::network_version_11_infinite_staking)
     {
-      // NOTE(loki): Grace period is not used anymore with infinite staking. So, if someone somehow reregisters, we just ignore it
+      // NOTE(sevabit): Grace period is not used anymore with infinite staking. So, if someone somehow reregisters, we just ignore it
       const auto iter = m_service_nodes_infos.find(key);
       if (iter != m_service_nodes_infos.end())
         return false;
@@ -1142,7 +1142,7 @@ namespace service_nodes
             if (unlock.key_image != locked_contribution->key_image)
               continue;
 
-            // NOTE(loki): This should be checked in blockchain check_tx_inputs already
+            // NOTE(sevabit): This should be checked in blockchain check_tx_inputs already
             crypto::hash const hash = service_nodes::generate_request_stake_unlock_hash(unlock.nonce);
             if (!crypto::check_signature(hash, locked_contribution->key_image_pub_key, unlock.signature))
             {
@@ -1262,7 +1262,7 @@ namespace service_nodes
     std::vector<crypto::public_key> expired_nodes;
     uint64_t const lock_blocks = staking_num_lock_blocks(m_blockchain.nettype());
 
-    // TODO(loki): This should really use the registration height instead of getting the block and expiring nodes.
+    // TODO(sevabit): This should really use the registration height instead of getting the block and expiring nodes.
     // But there's something subtly off when using registration height causing syncing problems.
     if (m_blockchain.get_hard_fork_version(block_height) == cryptonote::network_version_9_service_nodes)
     {
@@ -1375,7 +1375,7 @@ namespace service_nodes
     if (hard_fork_version < 9)
       return true;
 
-    // NOTE(loki): Service node reward distribution is calculated from the
+    // NOTE(sevabit): Service node reward distribution is calculated from the
     // original amount, i.e. 50% of the original base reward goes to service
     // nodes not 50% of the reward after removing the governance component (the
     // adjusted base reward post hardfork 10).
@@ -1430,7 +1430,7 @@ namespace service_nodes
   }
 
   template<typename T>
-  void loki_shuffle(std::vector<T>& a, uint64_t seed)
+  void sevabit_shuffle(std::vector<T>& a, uint64_t seed)
   {
     if (a.size() <= 1) return;
     std::mt19937_64 mersenne_twister(seed);
@@ -1461,7 +1461,7 @@ namespace service_nodes
       uint64_t seed = 0;
       std::memcpy(&seed, block_hash.data, std::min(sizeof(seed), sizeof(block_hash.data)));
 
-      loki_shuffle(pub_keys_indexes, seed);
+      sevabit_shuffle(pub_keys_indexes, seed);
     }
 
     // Assign indexes from shuffled list into quorum and list of nodes to test
@@ -1799,8 +1799,8 @@ namespace service_nodes
 
         result.addresses.push_back(info.address);
         result.portions.push_back(num_portions);
-        uint64_t loki_amount = service_nodes::portions_to_amount(num_portions, staking_requirement);
-        total_reserved      += loki_amount;
+        uint64_t sevabit_amount = service_nodes::portions_to_amount(num_portions, staking_requirement);
+        total_reserved      += sevabit_amount;
       }
       catch (const std::exception &e)
       {

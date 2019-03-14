@@ -1206,7 +1206,7 @@ namespace hw {
 
       //compute derivation, out_eph_public_key, and amount key in one shot on device, to ensure checkable link
       const crypto::secret_key *sec;
-      bool &is_change = found_change; // NOTE(loki): Alias our param into theirs so we don't have to change much code.
+      bool &is_change = found_change; // NOTE(sevabit): Alias our param into theirs so we don't have to change much code.
 
       if (change_addr && dst_entr == *change_addr && !is_change)
       {

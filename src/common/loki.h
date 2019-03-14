@@ -1,4 +1,4 @@
-// Copyright (c) 2018, The Loki Project
+// Copyright (c) 2018, The Sevabit Project
 // 
 // All rights reserved.
 // 
@@ -36,6 +36,6 @@ namespace loki
 double      round           (double);
 double      exp2            (double);
 std::string hex64_to_base32z(std::string const& src);
-}; // namespace Loki
+}; // namespace Sevabit
 
 #endif // SEVABIT_H

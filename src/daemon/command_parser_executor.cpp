@@ -1,5 +1,5 @@
 // Copyright (c) 2014-2018, The Monero Project
-// Copyright (c)      2018, The Loki Project
+// Copyright (c)      2018, The Sevabit Project
 // 
 // All rights reserved.
 // 
@@ -801,7 +801,7 @@ bool t_command_parser_executor::pop_blocks(const std::vector<std::string>& args)
 
 bool t_command_parser_executor::version(const std::vector<std::string>& args)
 {
-  std::cout << "Loki '" << SEVABIT_RELEASE_NAME << "' (v" << SEVABIT_VERSION_FULL << ")" << std::endl;
+  std::cout << "Sevabit '" << SEVABIT_RELEASE_NAME << "' (v" << SEVABIT_VERSION_FULL << ")" << std::endl;
   return true;
 }
 

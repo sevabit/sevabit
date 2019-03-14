@@ -485,7 +485,7 @@ bool gen_tx_mixed_key_offset_not_exist::generate(std::vector<test_event_entry>& 
   events.push_back(builder.m_tx);
 #endif
 
-  // Loki version
+  // Sevabit version
 #if 0
   GENERATE_ACCOUNT  (miner_account);
   MAKE_GENESIS_BLOCK(events, blk_tail, miner_account, ts_start);

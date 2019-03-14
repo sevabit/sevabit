@@ -1,5 +1,5 @@
 // Copyright (c) 2014-2018, The Monero Project
-// Copyright (c)      2018, The Loki Project
+// Copyright (c)      2018, The Sevabit Project
 //
 // All rights reserved.
 //
@@ -1023,7 +1023,7 @@ namespace cryptonote
   //------------------------------------------------------------------------------------------------------------------------------
 
   //
-  // Loki
+  // Sevabit
   //
   bool core_rpc_server::on_get_output_blacklist_bin(const COMMAND_RPC_GET_OUTPUT_BLACKLIST::request& req, COMMAND_RPC_GET_OUTPUT_BLACKLIST::response& res, const connection_context *ctx)
   {
@@ -2392,7 +2392,7 @@ namespace cryptonote
     };
 
   //
-  // Loki
+  // Sevabit
   //
   bool core_rpc_server::on_get_quorum_state(const COMMAND_RPC_GET_QUORUM_STATE::request& req, COMMAND_RPC_GET_QUORUM_STATE::response& res, epee::json_rpc::error& error_resp, const connection_context *ctx)
   {

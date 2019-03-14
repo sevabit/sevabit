@@ -1,9 +1,9 @@
-Loki daemon internationalization
+Sevabit daemon internationalization
 ==================================
 
-The Loki command line tools can be translated in various languages. If you wish to contribute and need help/support, contact the [Loki Localization Workgroup on Taiga](https://taiga.getloki.org/project/erciccione-loki-localization/) or come chat on `#loki-translations` (Freenode/IRC, riot/matrix, MatterMost)
+The Sevabit command line tools can be translated in various languages. If you wish to contribute and need help/support, contact the [Sevabit Localization Workgroup on Taiga](https://taiga.getloki.org/project/erciccione-loki-localization/) or come chat on `#loki-translations` (Freenode/IRC, riot/matrix, MatterMost)
 
-In order to use the same translation workflow as the [Loki GUI](https://github.com/loki-project/loki-gui), they use Qt Linguist translation files.  However, to avoid the dependencies on Qt this normally implies, they use a custom loader to read those files at runtime.
+In order to use the same translation workflow as the [Sevabit GUI](https://github.com/loki-project/loki-gui), they use Qt Linguist translation files.  However, to avoid the dependencies on Qt this normally implies, they use a custom loader to read those files at runtime.
 
 ### Tools for translators
 

@@ -1,5 +1,5 @@
 // Copyright (c) 2014-2018, The Monero Project
-// Copyright (c)      2018, The Loki Project
+// Copyright (c)      2018, The Sevabit Project
 // 
 // All rights reserved.
 // 
@@ -426,7 +426,7 @@ bool t_command_server::help(const std::vector<std::string>& args)
 std::string t_command_server::get_commands_str()
 {
   std::stringstream ss;
-  ss << "Loki '" << SEVABIT_RELEASE_NAME << "' (v" << SEVABIT_VERSION_FULL << ")" << std::endl;
+  ss << "Sevabit '" << SEVABIT_RELEASE_NAME << "' (v" << SEVABIT_VERSION_FULL << ")" << std::endl;
   ss << "Commands: " << std::endl;
   std::string usage = m_command_lookup.get_usage();
   boost::replace_all(usage, "\n", "\n  ");

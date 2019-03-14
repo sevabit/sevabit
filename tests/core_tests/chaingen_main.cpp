@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
     if (run_all)
     {
 #if 1
-      GENERATE_AND_PLAY(gen_batched_governance_reward); // Loki Governance
+      GENERATE_AND_PLAY(gen_batched_governance_reward); // Sevabit Governance
 
       GENERATE_AND_PLAY(gen_simple_chain_001);
       GENERATE_AND_PLAY(gen_simple_chain_split_1);

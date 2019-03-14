@@ -1,5 +1,5 @@
 // Copyright (c) 2014-2018, The Monero Project
-// Copyright (c)      2018, The Loki Project
+// Copyright (c)      2018, The Sevabit Project
 // 
 // All rights reserved.
 // 
@@ -635,7 +635,7 @@ namespace tools
           }
           if (addresses.empty())
           {
-            er.message = std::string("No Loki address found at ") + url;
+            er.message = std::string("No Sevabit address found at ") + url;
             return {};
           }
           return addresses[0];
@@ -1865,7 +1865,7 @@ namespace tools
         }
         if (addresses.empty())
         {
-          er.message = std::string("No Loki address found at ") + url;
+          er.message = std::string("No Sevabit address found at ") + url;
           return {};
         }
         return addresses[0];
@@ -2651,7 +2651,7 @@ namespace tools
         }
         if (addresses.empty())
         {
-          er.message = std::string("No Loki address found at ") + url;
+          er.message = std::string("No Sevabit address found at ") + url;
           return {};
         }
         return addresses[0];
@@ -3767,7 +3767,7 @@ namespace tools
             }
             if (addresses.empty())
             {
-              er.message = std::string("No Loki address found at ") + url;
+              er.message = std::string("No Sevabit address found at ") + url;
               return {};
             }
             address = addresses[0];
@@ -3802,7 +3802,7 @@ namespace tools
   //------------------------------------------------------------------------------------------------------------------------------
 
   //
-  // Loki
+  // Sevabit
   //
   bool wallet_rpc_server::on_stake(const wallet_rpc::COMMAND_RPC_STAKE::request& req, wallet_rpc::COMMAND_RPC_STAKE::response& res, epee::json_rpc::error& er, const connection_context *ctx)
   {

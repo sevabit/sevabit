@@ -501,7 +501,7 @@ loki::round (double x)
   return z;
 }
 
-// adapted from Lokinet llarp/encode.hpp
+// adapted from Sevabitnet llarp/encode.hpp
 // from  https://en.wikipedia.org/wiki/Base32#z-base-32
 static const char zbase32_alpha[] = {'y', 'b', 'n', 'd', 'r', 'f', 'g', '8',
                                      'e', 'j', 'k', 'm', 'c', 'p', 'q', 'x',

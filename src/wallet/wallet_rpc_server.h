@@ -1,5 +1,5 @@
 // Copyright (c) 2014-2018, The Monero Project
-// Copyright (c)      2018, The Loki Project
+// Copyright (c)      2018, The Sevabit Project
 // 
 // All rights reserved.
 // 
@@ -152,7 +152,7 @@ namespace tools
         MAP_JON_RPC_WE("get_version",        on_get_version,        wallet_rpc::COMMAND_RPC_GET_VERSION)
 
         //
-        // Loki
+        // Sevabit
         //
         MAP_JON_RPC_WE("stake", on_stake, wallet_rpc::COMMAND_RPC_STAKE)
         MAP_JON_RPC_WE("register_service_node", on_register_service_node, wallet_rpc::COMMAND_RPC_REGISTER_SERVICE_NODE)

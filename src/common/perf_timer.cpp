@@ -1,5 +1,5 @@
 // Copyright (c) 2016-2018, The Monero Project
-// Copyright (c)      2018, The Loki Project
+// Copyright (c)      2018, The Sevabit Project
 // 
 // All rights reserved.
 // 

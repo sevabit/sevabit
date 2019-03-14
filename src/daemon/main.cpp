@@ -1,5 +1,5 @@
 // Copyright (c) 2014-2018, The Monero Project
-// Copyright (c)      2018, The Loki Project
+// Copyright (c)      2018, The Sevabit Project
 //
 // All rights reserved.
 //
@@ -120,16 +120,16 @@ int main(int argc, char const * argv[])
 
     if (command_line::get_arg(vm, command_line::arg_help))
     {
-      std::cout << "Loki '" << SEVABIT_RELEASE_NAME << "' (v" << SEVABIT_VERSION_FULL << ")" << ENDL << ENDL;
+      std::cout << "Sevabit '" << SEVABIT_RELEASE_NAME << "' (v" << SEVABIT_VERSION_FULL << ")" << ENDL << ENDL;
       std::cout << "Usage: " + std::string{argv[0]} + " [options|settings] [daemon_command...]" << std::endl << std::endl;
       std::cout << visible_options << std::endl;
       return 0;
     }
 
-    // Loki Version
+    // Sevabit Version
     if (command_line::get_arg(vm, command_line::arg_version))
     {
-      std::cout << "Loki '" << SEVABIT_RELEASE_NAME << "' (v" << SEVABIT_VERSION_FULL << ")" << ENDL;
+      std::cout << "Sevabit '" << SEVABIT_RELEASE_NAME << "' (v" << SEVABIT_VERSION_FULL << ")" << ENDL;
       return 0;
     }
 
@@ -225,7 +225,7 @@ int main(int argc, char const * argv[])
       tools::set_max_concurrency(command_line::get_arg(vm, daemon_args::arg_max_concurrency));
 
     // logging is now set up
-    MGINFO("Loki '" << SEVABIT_RELEASE_NAME << "' (v" << SEVABIT_VERSION_FULL << ")");
+    MGINFO("Sevabit '" << SEVABIT_RELEASE_NAME << "' (v" << SEVABIT_VERSION_FULL << ")");
 
     // If there are positional options, we're running a daemon command
     {

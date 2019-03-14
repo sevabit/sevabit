@@ -49,7 +49,7 @@ namespace cryptonote
   uint64_t get_portion_of_reward                (uint64_t portions, uint64_t total_service_node_reward);
   uint64_t service_node_reward_formula          (uint64_t base_reward, int hard_fork_version);
 
-  struct loki_miner_tx_context // NOTE(loki): All the custom fields required by Loki to use construct_miner_tx
+  struct loki_miner_tx_context // NOTE(loki): All the custom fields required by Sevabit to use construct_miner_tx
   {
     using stake_portions = uint64_t;
 

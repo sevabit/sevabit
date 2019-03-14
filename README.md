@@ -1,17 +1,17 @@
-# Loki
+# Sevabit
 
 <p align="center">
     <a href="https://github.com/loki-project/loki/commits/dev"><img alt="pipeline status" src="https://gitlab.com/lokiproject/loki/badges/dev/pipeline.svg" /></a>
 </p>
 
-Copyright (c) 2018 The Loki Project.   
+Copyright (c) 2018 The Sevabit Project.   
 Portions Copyright (c) 2014-2018 The Monero Project.   
 Portions Copyright (c) 2012-2013 The Cryptonote developers.
 
 ## Development resources
 
 - Web: [loki.network](https://loki.network)
-- Telegram: [t.me/LokiCommunity](https://t.me/LokiCommunity)
+- Telegram: [t.me/SevabitCommunity](https://t.me/SevabitCommunity)
 - Mail: [team@loki.network](mailto:team@loki.network)
 - GitHub: [https://github.com/loki-project/loki](https://github.com/loki-project/loki)
 - Discord: [https://discord.gg/67GXfD6](https://discord.gg/67GXfD6)
@@ -22,13 +22,13 @@ Portions Copyright (c) 2012-2013 The Cryptonote developers.
 
 ## Information
 
-Loki is a private cryptocurrency based on Monero. Loki currently offers an incentivised full node layer, over the coming months we will be looking to support a secondary p2p network (Lokinet) and a messenger that offers private communications based on the Signal protocol (Loki Messenger).
+Sevabit is a private cryptocurrency based on Monero. Sevabit currently offers an incentivised full node layer, over the coming months we will be looking to support a secondary p2p network (Sevabitnet) and a messenger that offers private communications based on the Signal protocol (Sevabit Messenger).
 
 More information on the project can be found on the website and in the whitepaper.
 
-Loki is an open source project, and we encourage contributions from anyone with something to offer. For more information on contributing, please contact team@loki.network
+Sevabit is an open source project, and we encourage contributions from anyone with something to offer. For more information on contributing, please contact team@loki.network
 
-## Compiling Loki from source
+## Compiling Sevabit from source
 
 ### Dependencies
 
@@ -82,7 +82,7 @@ If you already have a repo cloned, initialize and update:
 
 ### Build instructions
 
-Loki uses the CMake build system and a top-level [Makefile](Makefile) that
+Sevabit uses the CMake build system and a top-level [Makefile](Makefile) that
 invokes cmake commands as needed.
 
 #### On Linux and OS X
@@ -103,7 +103,7 @@ invokes cmake commands as needed.
     https://github.com/zeromq/cppzmq to `/usr/local/include` should fix that error.
 
     *Note*: The instructions above will compile the most stable release of the
-    Loki software. If you would like to use and test the most recent software,
+    Sevabit software. If you would like to use and test the most recent software,
     use ```git checkout master```. The master branch may contain updates that are
     both unstable and incompatible with release software, though testing is always
     encouraged.
@@ -112,7 +112,7 @@ invokes cmake commands as needed.
 
 * Add `PATH="$PATH:$HOME/loki/build/release/bin"` to `.profile`
 
-* Run Loki with `lokid --detach`
+* Run Sevabit with `lokid --detach`
 
 * **Optional**: build and run the test suite to verify the binaries:
 
@@ -140,7 +140,7 @@ Tested on a Raspberry Pi Zero with a clean install of minimal Raspbian Stretch (
 
 * `apt-get update && apt-get upgrade` to install all of the latest software
 
-* Install the dependencies for Loki from the 'Debian' column in the table above.
+* Install the dependencies for Sevabit from the 'Debian' column in the table above.
 
 * Increase the system swap size:
 ```
@@ -167,13 +167,13 @@ Tested on a Raspberry Pi Zero with a clean install of minimal Raspbian Stretch (
 
 * Add `PATH="$PATH:$HOME/loki/build/release/bin"` to `.profile`
 
-* Run Loki with `lokid --detach`
+* Run Sevabit with `lokid --detach`
 
 * You may wish to reduce the size of the swap file after the build has finished, and delete the boost directory from your home directory
 
 #### *Note for Raspbian Jessie users:*
 
-If you are using the older Raspbian Jessie image, compiling Loki is a bit more complicated. The version of Boost available in the Debian Jessie repositories is too old to use with Loki, and thus you must compile a newer version yourself. The following explains the extra steps, and has been tested on a Raspberry Pi 2 with a clean install of minimal Raspbian Jessie.
+If you are using the older Raspbian Jessie image, compiling Sevabit is a bit more complicated. The version of Boost available in the Debian Jessie repositories is too old to use with Sevabit, and thus you must compile a newer version yourself. The following explains the extra steps, and has been tested on a Raspberry Pi 2 with a clean install of minimal Raspbian Jessie.
 
 * As before, `apt-get update && apt-get upgrade` to install all of the latest software, and increase the system swap size
 
@@ -184,7 +184,7 @@ If you are using the older Raspbian Jessie image, compiling Loki is a bit more c
 	sudo /etc/init.d/dphys-swapfile start  
 ```
 
-* Then, install the dependencies for Loki except `libunwind` and `libboost-all-dev`
+* Then, install the dependencies for Sevabit except `libunwind` and `libboost-all-dev`
 
 * Install the latest version of boost (this may first require invoking `apt-get remove --purge libboost*` to remove a previous version if you're not using a clean install):
 ```
@@ -293,7 +293,7 @@ The doxygen and graphviz packages are optional and require the xbase set.
 The Boost package has a bug that will prevent librpc.a from building correctly. In order to fix this, you will have to Build boost yourself from scratch. Follow the directions here (under "Building Boost"):
 https://github.com/bitcoin/bitcoin/blob/master/doc/build-openbsd.md
 
-You will have to add the serialization, date_time, and regex modules to Boost when building as they are needed by Loki.
+You will have to add the serialization, date_time, and regex modules to Boost when building as they are needed by Sevabit.
 
 To build: `env CC=egcc CXX=eg++ CPP=ecpp DEVELOPER_LOCAL_TOOLS=1 BOOST_ROOT=/path/to/the/boost/you/built make release-static-64`
 
@@ -433,11 +433,11 @@ You can also cross-compile static binaries on Linux for Windows and macOS with t
 
 The required packages are the names for each toolchain on apt. Depending on your distro, they may have different names.
 
-Using `depends` might also be easier to compile Loki on Windows than using MSYS. Activate Windows Subsystem for Linux (WSL) with a distro (for example Ubuntu), install the apt build-essentials and follow the `depends` steps as depicted above.
+Using `depends` might also be easier to compile Sevabit on Windows than using MSYS. Activate Windows Subsystem for Linux (WSL) with a distro (for example Ubuntu), install the apt build-essentials and follow the `depends` steps as depicted above.
 
 The produced binaries still link libc dynamically. If the binary is compiled on a current distribution, it might not run on an older distribution with an older installation of libc. Passing `-DBACKCOMPAT=ON` to cmake will make sure that the binary will run on systems having at least libc version 2.17.
 
-## Installing Loki from a package
+## Installing Sevabit from a package
 
 * Docker
 
@@ -480,7 +480,7 @@ See [README.i18n.md](README.i18n.md).
 
 ## Using Tor
 
-While Loki isn't made to integrate with Tor, it can be used wrapped with torsocks, by
+While Sevabit isn't made to integrate with Tor, it can be used wrapped with torsocks, by
 setting the following configuration parameters and environment variables:
 
 * `--p2p-bind-ip 127.0.0.1` on the command line or `p2p-bind-ip=127.0.0.1` in
@@ -518,7 +518,7 @@ allow inbound connections. Full example:
 
 ## Debugging
 
-This section contains general instructions for debugging failed installs or problems encountered with Loki. First ensure you are running the latest version built from the Github repo.
+This section contains general instructions for debugging failed installs or problems encountered with Sevabit. First ensure you are running the latest version built from the Github repo.
 
 ### Obtaining stack traces and core dumps on Unix systems
 
@@ -566,7 +566,7 @@ There are two tools available:
 
 * ASAN
 
-Configure Loki with the -D SANITIZE=ON cmake flag, eg:
+Configure Sevabit with the -D SANITIZE=ON cmake flag, eg:
 
     cd build/debug && cmake -D SANITIZE=ON -D CMAKE_BUILD_TYPE=Debug ../..
 

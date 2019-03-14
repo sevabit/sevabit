@@ -802,7 +802,7 @@ TEST(Serialization, portability_wallet)
   }
 }
 
-#define OUTPUT_EXPORT_FILE_MAGIC "Loki output export\003"
+#define OUTPUT_EXPORT_FILE_MAGIC "Sevabit output export\003"
 TEST(Serialization, portability_outputs)
 {
   const bool restricted = false;
@@ -937,7 +937,7 @@ TEST(Serialization, portability_outputs)
   ASSERT_TRUE(td2.m_pk_index == 0);
 }
 
-#define UNSIGNED_TX_PREFIX "Loki unsigned tx set\004"
+#define UNSIGNED_TX_PREFIX "Sevabit unsigned tx set\004"
 struct unsigned_tx_set
 {
   std::vector<tools::wallet2::tx_construction_data> txes;
@@ -1148,7 +1148,7 @@ TEST(Serialization, portability_unsigned_tx)
   ASSERT_TRUE(td2.m_pk_index == 0);
 }
 
-#define SIGNED_TX_PREFIX "Loki signed tx set\004"
+#define SIGNED_TX_PREFIX "Sevabit signed tx set\004"
 TEST(Serialization, portability_signed_tx)
 {
   const bool restricted = false;

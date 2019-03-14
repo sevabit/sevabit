@@ -130,7 +130,7 @@ void loki::init_integration_test_context(const std::string &base_name)
     if (once_only)
     {
       once_only = false;
-      printf("Loki Integration Test: Shared memory %s has not been created yet, blocking ...\n", global_stdin_shared_mem->Path().c_str());
+      printf("Sevabit Integration Test: Shared memory %s has not been created yet, blocking ...\n", global_stdin_shared_mem->Path().c_str());
     }
   }
 
@@ -139,12 +139,12 @@ void loki::init_integration_test_context(const std::string &base_name)
   global_stdout_ready_semaphore = sem_open(global_stdout_ready_semaphore_name.c_str(), O_CREAT, 0600, 0);
   global_stdin_ready_semaphore = sem_open(global_stdin_ready_semaphore_name.c_str(), O_CREAT, 0600, 0);
 
-  if (!global_stdin_semaphore_handle)  fprintf(stderr, "Loki Integration Test: Failed to initialise global_stdin_semaphore_handle\n");
-  if (!global_stdout_semaphore_handle) fprintf(stderr, "Loki Integration Test: Failed to initialise global_stdout_semaphore_handle\n");
-  if (!global_stdout_ready_semaphore) fprintf(stderr, "Loki Integration Test: Failed to initialise global_stdout_ready_semaphore_handle\n");
-  if (!global_stdin_ready_semaphore) fprintf(stderr, "Loki Integration Test: Failed to initialise global_stdin_ready_semaphore_handle\n");
+  if (!global_stdin_semaphore_handle)  fprintf(stderr, "Sevabit Integration Test: Failed to initialise global_stdin_semaphore_handle\n");
+  if (!global_stdout_semaphore_handle) fprintf(stderr, "Sevabit Integration Test: Failed to initialise global_stdout_semaphore_handle\n");
+  if (!global_stdout_ready_semaphore) fprintf(stderr, "Sevabit Integration Test: Failed to initialise global_stdout_ready_semaphore_handle\n");
+  if (!global_stdin_ready_semaphore) fprintf(stderr, "Sevabit Integration Test: Failed to initialise global_stdin_ready_semaphore_handle\n");
 
-  printf("Loki Integration Test: Hooks initialised into shared memory, %s, %s, %s, %s, %s, %s\n",
+  printf("Sevabit Integration Test: Hooks initialised into shared memory, %s, %s, %s, %s, %s, %s\n",
       stdin_name.c_str(),
       stdout_name.c_str(),
       global_stdin_semaphore_name.c_str(),

@@ -253,7 +253,7 @@ bool gen_bp_tx_validation_base::check_bp(const cryptonote::transaction &tx, size
 // have 1 output. So my fix is to make it so we don't generate a tx that makes
 // too high of a fee from the change amount.
 
-// Further addendum. In Loki hardfork 10, we also introduce batching governance
+// Further addendum. In Sevabit hardfork 10, we also introduce batching governance
 // payments- so most block heights will remove the governance output from the
 // reward. So if we send less than the governance amount (~6ish loki from the
 // start of the chain), then we'll eclipse the reward again and overflow, so

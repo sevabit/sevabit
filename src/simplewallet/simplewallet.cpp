@@ -97,8 +97,8 @@ using boost::lexical_cast;
 namespace po = boost::program_options;
 typedef cryptonote::simple_wallet sw;
 
-#undef LOKI_DEFAULT_LOG_CATEGORY
-#define LOKI_DEFAULT_LOG_CATEGORY "wallet.simplewallet"
+#undef SEVABIT_DEFAULT_LOG_CATEGORY
+#define SEVABIT_DEFAULT_LOG_CATEGORY "wallet.simplewallet"
 
 #define EXTENDED_LOGS_FILE "wallet_details.log"
 
@@ -258,7 +258,7 @@ namespace
   const char* USAGE_REQUEST_STAKE_UNLOCK("request_stake_unlock <service_node_pubkey>");
   const char* USAGE_PRINT_LOCKED_STAKES("print_locked_stakes");
 
-#if defined (LOKI_ENABLE_INTEGRATION_TEST_HOOKS)
+#if defined (SEVABIT_ENABLE_INTEGRATION_TEST_HOOKS)
   std::string input_line(const std::string& prompt, bool yesno = false)
   {
     std::string buf;
@@ -270,7 +270,7 @@ namespace
     buf = buffer.data;
     return epee::string_tools::trim(buf);
   }
-#else // LOKI_ENABLE_INTEGRATION_TEST_HOOKS
+#else // SEVABIT_ENABLE_INTEGRATION_TEST_HOOKS
   std::string input_line(const std::string& prompt, bool yesno = false)
   {
     std::string buf;
@@ -291,11 +291,11 @@ namespace
 
     return epee::string_tools::trim(buf);
   }
-#endif // LOKI_ENABLE_INTEGRATION_TEST_HOOKS
+#endif // SEVABIT_ENABLE_INTEGRATION_TEST_HOOKS
 
   epee::wipeable_string input_secure_line(const char *prompt)
   {
-#if defined (LOKI_ENABLE_INTEGRATION_TEST_HOOKS)
+#if defined (SEVABIT_ENABLE_INTEGRATION_TEST_HOOKS)
     std::cout << prompt;
     loki::write_redirected_stdout_to_shared_mem();
     loki::fixed_buffer buffer = loki::read_from_stdin_shared_mem();
@@ -321,7 +321,7 @@ namespace
 
   boost::optional<tools::password_container> password_prompter(const char *prompt, bool verify)
   {
-#if defined(LOKI_ENABLE_INTEGRATION_TEST_HOOKS)
+#if defined(SEVABIT_ENABLE_INTEGRATION_TEST_HOOKS)
     std::cout << prompt << ": NOTE(loki): Passwords not supported, defaulting to empty password";
     loki::write_redirected_stdout_to_shared_mem();
     tools::password_container pwd_container(std::string(""));
@@ -2037,7 +2037,7 @@ bool simple_wallet::save_known_rings(const std::vector<std::string> &args)
 
 bool simple_wallet::version(const std::vector<std::string> &args)
 {
-  message_writer() << "Loki '" << LOKI_RELEASE_NAME << "' (v" << LOKI_VERSION_FULL << ")";
+  message_writer() << "Loki '" << SEVABIT_RELEASE_NAME << "' (v" << SEVABIT_VERSION_FULL << ")";
   return true;
 }
 
@@ -8147,7 +8147,7 @@ std::string simple_wallet::get_prompt() const
 }
 //----------------------------------------------------------------------------------------------------
 
-#if defined(LOKI_ENABLE_INTEGRATION_TEST_HOOKS)
+#if defined(SEVABIT_ENABLE_INTEGRATION_TEST_HOOKS)
 #include <thread>
 #endif
 
@@ -8163,7 +8163,7 @@ bool simple_wallet::run()
 
   message_writer(console_color_green, false) << "Background refresh thread started";
 
-#if defined(LOKI_ENABLE_INTEGRATION_TEST_HOOKS)
+#if defined(SEVABIT_ENABLE_INTEGRATION_TEST_HOOKS)
   for (;;)
   {
     loki::fixed_buffer const input = loki::read_from_stdin_shared_mem();

@@ -41,8 +41,8 @@
 #include "cryptonote_config.h"
 #include "difficulty.h"
 
-#undef LOKI_DEFAULT_LOG_CATEGORY
-#define LOKI_DEFAULT_LOG_CATEGORY "difficulty"
+#undef SEVABIT_DEFAULT_LOG_CATEGORY
+#define SEVABIT_DEFAULT_LOG_CATEGORY "difficulty"
 
 namespace cryptonote {
 

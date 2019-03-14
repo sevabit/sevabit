@@ -84,8 +84,8 @@ using namespace epee;
 #include <openssl/sha.h>
 #include "i18n.h"
 
-#undef LOKI_DEFAULT_LOG_CATEGORY
-#define LOKI_DEFAULT_LOG_CATEGORY "util"
+#undef SEVABIT_DEFAULT_LOG_CATEGORY
+#define SEVABIT_DEFAULT_LOG_CATEGORY "util"
 
 namespace
 {

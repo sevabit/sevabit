@@ -48,8 +48,8 @@
 #include <string>
 #include <numeric>
 
-#undef LOKI_DEFAULT_LOG_CATEGORY
-#define LOKI_DEFAULT_LOG_CATEGORY "daemon"
+#undef SEVABIT_DEFAULT_LOG_CATEGORY
+#define SEVABIT_DEFAULT_LOG_CATEGORY "daemon"
 
 namespace daemonize {
 
@@ -61,7 +61,7 @@ namespace {
   {
     std::cout << prompt << std::flush;
     std::string result;
-#if defined (LOKI_ENABLE_INTEGRATION_TEST_HOOKS)
+#if defined (SEVABIT_ENABLE_INTEGRATION_TEST_HOOKS)
     loki::write_redirected_stdout_to_shared_mem();
     loki::fixed_buffer buffer = loki::read_from_stdin_shared_mem();
     result.reserve(buffer.len);

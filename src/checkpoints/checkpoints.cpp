@@ -41,8 +41,8 @@ using namespace epee;
 
 #include "common/loki_integration_test_hooks.h"
 
-#undef LOKI_DEFAULT_LOG_CATEGORY
-#define LOKI_DEFAULT_LOG_CATEGORY "checkpoints"
+#undef SEVABIT_DEFAULT_LOG_CATEGORY
+#define SEVABIT_DEFAULT_LOG_CATEGORY "checkpoints"
 
 namespace cryptonote
 {
@@ -172,7 +172,7 @@ namespace cryptonote
       case UNDEFINED:
         break;
       case MAINNET:
-#if !defined(LOKI_ENABLE_INTEGRATION_TEST_HOOKS)
+#if !defined(SEVABIT_ENABLE_INTEGRATION_TEST_HOOKS)
         ADD_CHECKPOINT(0,     "0c5455eb31db765b2e2a3c2e4ebf5b500c1a3e4ddc6b72d62ce23a04952af381");
     	ADD_CHECKPOINT(1,     "9fcd2ffbafd27b0a2a16878e4c49a843e63e5a1be985fb4c327892ac650fb07d");
     	ADD_CHECKPOINT(2,     "a6ace8e6763dca9b5dc83d8b3d2aade6bf52a06154a96b300232f831cdeb4456");

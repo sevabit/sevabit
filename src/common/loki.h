@@ -26,8 +26,8 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef LOKI_H
-#define LOKI_H
+#ifndef SEVABIT_H
+#define SEVABIT_H
 
 #include <string>
 
@@ -38,4 +38,4 @@ double      exp2            (double);
 std::string hex64_to_base32z(std::string const& src);
 }; // namespace Loki
 
-#endif // LOKI_H
+#endif // SEVABIT_H

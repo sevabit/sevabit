@@ -45,8 +45,8 @@ using namespace epee;
 #include "common/dns_utils.h"
 #include "common/loki.h"
 
-#undef LOKI_DEFAULT_LOG_CATEGORY
-#define LOKI_DEFAULT_LOG_CATEGORY "cn"
+#undef SEVABIT_DEFAULT_LOG_CATEGORY
+#define SEVABIT_DEFAULT_LOG_CATEGORY "cn"
 
 namespace cryptonote {
 

@@ -74,7 +74,7 @@ target_link_libraries(wallet
   PRIVATE
     ${EXTRA_LIBRARIES})
 
-if (NOT LOKI_DAEMON_AND_WALLET_ONLY)
+if (NOT SEVABIT_DAEMON_AND_WALLET_ONLY)
   set(wallet_rpc_sources
     wallet_rpc_server.cpp)
 

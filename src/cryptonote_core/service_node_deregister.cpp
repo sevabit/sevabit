@@ -42,8 +42,8 @@
 #include <string>
 #include <vector>
 
-#undef LOKI_DEFAULT_LOG_CATEGORY
-#define LOKI_DEFAULT_LOG_CATEGORY "service_nodes"
+#undef SEVABIT_DEFAULT_LOG_CATEGORY
+#define SEVABIT_DEFAULT_LOG_CATEGORY "service_nodes"
 
 namespace service_nodes
 {

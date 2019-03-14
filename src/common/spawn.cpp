@@ -42,8 +42,8 @@
 #include "util.h"
 #include "spawn.h"
 
-#undef LOKI_DEFAULT_LOG_CATEGORY
-#define LOKI_DEFAULT_LOG_CATEGORY "spawn"
+#undef SEVABIT_DEFAULT_LOG_CATEGORY
+#define SEVABIT_DEFAULT_LOG_CATEGORY "spawn"
 
 namespace tools
 {

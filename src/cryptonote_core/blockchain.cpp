@@ -61,8 +61,8 @@
 #include "common/varint.h"
 #include "common/pruning.h"
 
-#undef LOKI_DEFAULT_LOG_CATEGORY
-#define LOKI_DEFAULT_LOG_CATEGORY "blockchain"
+#undef SEVABIT_DEFAULT_LOG_CATEGORY
+#define SEVABIT_DEFAULT_LOG_CATEGORY "blockchain"
 
 #define FIND_BLOCKCHAIN_SUPPLEMENT_MAX_SIZE (100*1024*1024) // 100 MB
 
@@ -333,7 +333,7 @@ bool Blockchain::init(BlockchainDB* db, const network_type nettype, bool offline
 
   m_db = db;
 
-#if defined(LOKI_ENABLE_INTEGRATION_TEST_HOOKS)
+#if defined(SEVABIT_ENABLE_INTEGRATION_TEST_HOOKS)
   // NOTE(doyle): Passing in test options in integration mode means we're
   // overriding fork heights for any nettype in our integration tests using
   // a command line argument. So m_nettype should just be nettype. In
@@ -350,7 +350,7 @@ bool Blockchain::init(BlockchainDB* db, const network_type nettype, bool offline
   if (m_hardfork == nullptr)
     m_hardfork = new HardFork(*db, 7);
 
-#define LOKI_ARRAY_COUNT(array) (sizeof(array)/sizeof(array[0]))
+#define SEVABIT_ARRAY_COUNT(array) (sizeof(array)/sizeof(array[0]))
   if (test_options) // Fakechain mode or in integration testing mode we're overriding hardfork dates
   {
     for (auto n = 0u; n < test_options->hard_forks.size(); ++n)
@@ -362,17 +362,17 @@ bool Blockchain::init(BlockchainDB* db, const network_type nettype, bool offline
   else
   {
     hard_fork_record const *hf_record = mainnet_hard_forks;
-    int hf_record_num_entries         = LOKI_ARRAY_COUNT(mainnet_hard_forks);
+    int hf_record_num_entries         = SEVABIT_ARRAY_COUNT(mainnet_hard_forks);
 
     if (m_nettype == TESTNET)
     {
       hf_record             = testnet_hard_forks;
-      hf_record_num_entries = LOKI_ARRAY_COUNT(testnet_hard_forks);
+      hf_record_num_entries = SEVABIT_ARRAY_COUNT(testnet_hard_forks);
     }
     else if (m_nettype == STAGENET)
     {
       hf_record             = stagenet_hard_forks;
-      hf_record_num_entries = LOKI_ARRAY_COUNT(stagenet_hard_forks);
+      hf_record_num_entries = SEVABIT_ARRAY_COUNT(stagenet_hard_forks);
     }
 
     for (int n = 0; n < hf_record_num_entries; ++n)

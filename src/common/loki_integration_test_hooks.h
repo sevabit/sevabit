@@ -1,11 +1,11 @@
-#if defined(LOKI_ENABLE_INTEGRATION_TEST_HOOKS)
+#if defined(SEVABIT_ENABLE_INTEGRATION_TEST_HOOKS)
 
 #if defined _WIN32
 #error "Need to implement semaphores for Windows Layer"
 #endif
 
-#ifndef LOKI_INTEGRATION_TEST_HOOKS_H
-#define LOKI_INTEGRATION_TEST_HOOKS_H
+#ifndef SEVABIT_INTEGRATION_TEST_HOOKS_H
+#define SEVABIT_INTEGRATION_TEST_HOOKS_H
 
 //
 // Header
@@ -43,12 +43,12 @@ extern bool core_is_idle;
 
 }; // namespace loki
 
-#endif // LOKI_INTEGRATION_TEST_HOOKS_H
+#endif // SEVABIT_INTEGRATION_TEST_HOOKS_H
 
 //
 // CPP Implementation
 //
-#ifdef LOKI_INTEGRATION_TEST_HOOKS_IMPLEMENTATION
+#ifdef SEVABIT_INTEGRATION_TEST_HOOKS_IMPLEMENTATION
 #include <string.h>
 #include <assert.h>
 #include <chrono>
@@ -277,6 +277,6 @@ void loki::write_redirected_stdout_to_shared_mem()
   use_redirected_cout();
 }
 
-#endif // LOKI_INTEGRATION_TEST_HOOKS_IMPLEMENTATION
-#endif // LOKI_ENABLE_INTEGRATION_TEST_HOOKS
+#endif // SEVABIT_INTEGRATION_TEST_HOOKS_IMPLEMENTATION
+#endif // SEVABIT_ENABLE_INTEGRATION_TEST_HOOKS
 

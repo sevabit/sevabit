@@ -83,22 +83,22 @@ function (loki_add_library name)
 endfunction()
 
 function (loki_add_library_with_deps)
-  cmake_parse_arguments(LOKI_ADD_LIBRARY "" "NAME" "DEPENDS;SOURCES" ${ARGN})
-  source_group("${LOKI_ADD_LIBRARY_NAME}" FILES ${LOKI_ADD_LIBRARY_SOURCES})
+  cmake_parse_arguments(SEVABIT_ADD_LIBRARY "" "NAME" "DEPENDS;SOURCES" ${ARGN})
+  source_group("${SEVABIT_ADD_LIBRARY_NAME}" FILES ${SEVABIT_ADD_LIBRARY_SOURCES})
 
   # Define a ("virtual") object library and an actual library that links those
   # objects together. The virtual libraries can be arbitrarily combined to link
   # any subset of objects into one library archive. This is used for releasing
   # libwallet, which combines multiple components.
-  set(objlib obj_${LOKI_ADD_LIBRARY_NAME})
-  add_library(${objlib} OBJECT ${LOKI_ADD_LIBRARY_SOURCES})
-  add_library("${LOKI_ADD_LIBRARY_NAME}" $<TARGET_OBJECTS:${objlib}>)
-  if (LOKI_ADD_LIBRARY_DEPENDS)
-    add_dependencies(${objlib} ${LOKI_ADD_LIBRARY_DEPENDS})
+  set(objlib obj_${SEVABIT_ADD_LIBRARY_NAME})
+  add_library(${objlib} OBJECT ${SEVABIT_ADD_LIBRARY_SOURCES})
+  add_library("${SEVABIT_ADD_LIBRARY_NAME}" $<TARGET_OBJECTS:${objlib}>)
+  if (SEVABIT_ADD_LIBRARY_DEPENDS)
+    add_dependencies(${objlib} ${SEVABIT_ADD_LIBRARY_DEPENDS})
   endif()
-  set_property(TARGET "${LOKI_ADD_LIBRARY_NAME}" PROPERTY FOLDER "libs")
+  set_property(TARGET "${SEVABIT_ADD_LIBRARY_NAME}" PROPERTY FOLDER "libs")
   target_compile_definitions(${objlib}
-    PRIVATE $<TARGET_PROPERTY:${LOKI_ADD_LIBRARY_NAME},INTERFACE_COMPILE_DEFINITIONS>)
+    PRIVATE $<TARGET_PROPERTY:${SEVABIT_ADD_LIBRARY_NAME},INTERFACE_COMPILE_DEFINITIONS>)
 endfunction ()
 
 include(Version)
@@ -116,7 +116,7 @@ add_subdirectory(wallet)
 add_subdirectory(cryptonote_protocol)
 
 if(NOT IOS)
-  if (NOT LOKI_DAEMON_AND_WALLET_ONLY AND NOT BUILD_INTEGRATION)
+  if (NOT SEVABIT_DAEMON_AND_WALLET_ONLY AND NOT BUILD_INTEGRATION)
     add_subdirectory(gen_multisig)
     add_subdirectory(blockchain_utilities)
   endif()
@@ -130,7 +130,7 @@ if(NOT IOS)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
-  if (NOT LOKI_DAEMON_AND_WALLET_ONLY AND NOT BUILD_INTEGRATION)
+  if (NOT SEVABIT_DAEMON_AND_WALLET_ONLY AND NOT BUILD_INTEGRATION)
     add_subdirectory(debug_utilities)
   endif()
 endif()

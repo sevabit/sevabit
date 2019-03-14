@@ -29,8 +29,8 @@
 #include <string.h>
 #include "net/buffer.h"
 
-#undef LOKI_DEFAULT_LOG_CATEGORY
-#define LOKI_DEFAULT_LOG_CATEGORY "net.buffer"
+#undef SEVABIT_DEFAULT_LOG_CATEGORY
+#define SEVABIT_DEFAULT_LOG_CATEGORY "net.buffer"
 
 namespace epee
 {

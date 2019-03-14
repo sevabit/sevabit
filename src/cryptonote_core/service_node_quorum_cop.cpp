@@ -35,8 +35,8 @@
 
 #include "common/loki_integration_test_hooks.h"
 
-#undef LOKI_DEFAULT_LOG_CATEGORY
-#define LOKI_DEFAULT_LOG_CATEGORY "quorum_cop"
+#undef SEVABIT_DEFAULT_LOG_CATEGORY
+#define SEVABIT_DEFAULT_LOG_CATEGORY "quorum_cop"
 
 namespace service_nodes
 {
@@ -75,7 +75,7 @@ namespace service_nodes
       return;
 
     time_t const now          = time(nullptr);
-#if defined(LOKI_ENABLE_INTEGRATION_TEST_HOOKS)
+#if defined(SEVABIT_ENABLE_INTEGRATION_TEST_HOOKS)
     time_t const min_lifetime = 0;
 #else
     time_t const min_lifetime = 60 * 60 * 2;
@@ -190,9 +190,9 @@ namespace service_nodes
 
   void generate_uptime_proof_request(const crypto::public_key& pubkey, const crypto::secret_key& seckey, cryptonote::NOTIFY_UPTIME_PROOF::request& req)
   {
-    req.snode_version_major = static_cast<uint16_t>(LOKI_VERSION_MAJOR);
-    req.snode_version_minor = static_cast<uint16_t>(LOKI_VERSION_MINOR);
-    req.snode_version_patch = static_cast<uint16_t>(LOKI_VERSION_PATCH);
+    req.snode_version_major = static_cast<uint16_t>(SEVABIT_VERSION_MAJOR);
+    req.snode_version_minor = static_cast<uint16_t>(SEVABIT_VERSION_MINOR);
+    req.snode_version_patch = static_cast<uint16_t>(SEVABIT_VERSION_PATCH);
     req.timestamp           = time(nullptr);
     req.pubkey              = pubkey;
 

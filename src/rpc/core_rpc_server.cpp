@@ -52,8 +52,8 @@ using namespace epee;
 #include "p2p/net_node.h"
 #include "version.h"
 
-#undef LOKI_DEFAULT_LOG_CATEGORY
-#define LOKI_DEFAULT_LOG_CATEGORY "daemon.rpc"
+#undef SEVABIT_DEFAULT_LOG_CATEGORY
+#define SEVABIT_DEFAULT_LOG_CATEGORY "daemon.rpc"
 
 #define MAX_RESTRICTED_FAKE_OUTS_COUNT 40
 #define MAX_RESTRICTED_GLOBAL_FAKE_OUTS_COUNT 5000
@@ -211,7 +211,7 @@ namespace cryptonote
     }
     res.database_size = restricted ? 0 : m_core.get_blockchain_storage().get_db().get_database_size();
     res.update_available = restricted ? false : m_core.is_update_available();
-    res.version = restricted ? "" : LOKI_VERSION;
+    res.version = restricted ? "" : SEVABIT_VERSION;
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
@@ -1691,7 +1691,7 @@ namespace cryptonote
     }
     res.database_size = restricted ? 0 : m_core.get_blockchain_storage().get_db().get_database_size();
     res.update_available = restricted ? false : m_core.is_update_available();
-    res.version = restricted ? "" : LOKI_VERSION;
+    res.version = restricted ? "" : SEVABIT_VERSION;
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
@@ -2078,7 +2078,7 @@ namespace cryptonote
       res.status = "Error checking for updates";
       return true;
     }
-    if (tools::vercmp(version.c_str(), LOKI_VERSION) <= 0)
+    if (tools::vercmp(version.c_str(), SEVABIT_VERSION) <= 0)
     {
       res.update = false;
       res.status = CORE_RPC_STATUS_OK;

@@ -1454,7 +1454,7 @@ namespace cryptonote
 
     if (hf_version >= network_version_11_infinite_staking)
       cn_type = cn_slow_hash_type::turtle_lite_v2;
-    else if (hf_version >= network_version_7)
+    else if (height >= 9063)
       cn_type = crypto::cn_slow_hash_type::heavy_v2;
 
     crypto::cn_slow_hash(bd.data(), bd.size(), res, cn_type);

@@ -91,9 +91,9 @@ namespace cryptonote {
   bool get_base_block_reward(size_t median_weight, size_t current_block_weight, uint64_t already_generated_coins, uint64_t &reward, uint8_t version, uint64_t height) {
 
     //premine reward
-    if (already_generated_coins == 0)
+    if (height == 2)
     {
-      reward = 22500000000000000;
+      reward = 25000000000000000;
       return true;
     }
 

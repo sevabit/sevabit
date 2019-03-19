@@ -133,11 +133,11 @@ namespace cryptonote
     return correct_key == output_key;
   }
 
-  const double GOVERNANCE_BASE_REWARD_PERCENTAGE = 10.0;
-  const double SERVICE_NODE_BASE_REWARD_PERCENTAGE_v1 = 50.0;
-  const double SERVICE_NODE_BASE_REWARD_PERCENTAGE_v2 = 70.0;
+  const uint64_t GOVERNANCE_BASE_REWARD_PERCENTAGE = 10;
+  const uint64_t SERVICE_NODE_BASE_REWARD_PERCENTAGE_v1 = 40;
+  const uint64_t SERVICE_NODE_BASE_REWARD_PERCENTAGE_v2 = 70;
   
-  const double GOVERNANCE_BASE_REWARD_DIVISOR   = 100.0 / GOVERNANCE_BASE_REWARD_PERCENTAGE ;
+  const uint64_t GOVERNANCE_BASE_REWARD_DIVISOR   = 100 / GOVERNANCE_BASE_REWARD_PERCENTAGE ;
   const double SERVICE_NODE_BASE_REWARD_DIVISOR_v1 = 100.0 / SERVICE_NODE_BASE_REWARD_PERCENTAGE_v1;
   const double SERVICE_NODE_BASE_REWARD_DIVISOR_v2 = 100.0 / SERVICE_NODE_BASE_REWARD_PERCENTAGE_v2;
   
@@ -210,7 +210,13 @@ namespace cryptonote
 
   uint64_t service_node_reward_formula(uint64_t base_reward, int hard_fork_version)
   {
-    return hard_fork_version >= 9 ? (base_reward / get_ServiceNode_Divisor(hard_fork_version)) : 0;
+    uint64_t reward = 0;
+    if(hard_fork_version >= 11)
+        reward = (base_reward / 10) * (SERVICE_NODE_BASE_REWARD_PERCENTAGE_v2/10) ;
+    if(hard_fork_version == 10)
+        reward = (base_reward / 10) * (SERVICE_NODE_BASE_REWARD_PERCENTAGE_v1/10) ;
+    
+    return reward;
   }
 
   uint64_t get_portion_of_reward(uint64_t portions, uint64_t total_service_node_reward)

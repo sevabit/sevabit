@@ -133,8 +133,22 @@ namespace cryptonote
     return correct_key == output_key;
   }
 
-  const int GOVERNANCE_BASE_REWARD_DIVISOR   = 20;
-  const int SERVICE_NODE_BASE_REWARD_DIVISOR = 2;
+  const double GOVERNANCE_BASE_REWARD_PERCENTAGE = 10.0;
+  const double SERVICE_NODE_BASE_REWARD_PERCENTAGE_v1 = 50.0;
+  const double SERVICE_NODE_BASE_REWARD_PERCENTAGE_v2 = 70.0;
+  
+  const double GOVERNANCE_BASE_REWARD_DIVISOR   = 100.0 / GOVERNANCE_BASE_REWARD_PERCENTAGE ;
+  const double SERVICE_NODE_BASE_REWARD_DIVISOR_v1 = 100.0 / SERVICE_NODE_BASE_REWARD_PERCENTAGE_v1;
+  const double SERVICE_NODE_BASE_REWARD_DIVISOR_v2 = 100.0 / SERVICE_NODE_BASE_REWARD_PERCENTAGE_v2;
+  
+  double get_ServiceNode_Divisor(const int hard_fork_version)
+  {
+        if (hard_fork_version >= 11)
+            return SERVICE_NODE_BASE_REWARD_DIVISOR_v2;
+        else
+            return SERVICE_NODE_BASE_REWARD_DIVISOR_v1;        
+  }
+  
   uint64_t governance_reward_formula(uint64_t base_reward)
   {
     return base_reward / GOVERNANCE_BASE_REWARD_DIVISOR;
@@ -178,15 +192,7 @@ namespace cryptonote
       snode_reward += output.amount;
     }
 
-    static_assert(SERVICE_NODE_BASE_REWARD_DIVISOR == 2 &&
-                  GOVERNANCE_BASE_REWARD_DIVISOR == 20,
-                  "Anytime this changes, you should revisit this code and "
-                  "check, because we rely on the service node reward being 50\% "
-                  "of the base reward, and does not receive any fees. This isn't "
-                  "exactly intuitive and so changes to the reward structure may "
-                  "make this assumption invalid.");
-
-    uint64_t base_reward  = snode_reward * SERVICE_NODE_BASE_REWARD_DIVISOR;
+    uint64_t base_reward  = snode_reward * get_ServiceNode_Divisor(b.major_version);
     uint64_t governance   = governance_reward_formula(base_reward);
     uint64_t block_reward = base_reward - governance;
 
@@ -204,7 +210,7 @@ namespace cryptonote
 
   uint64_t service_node_reward_formula(uint64_t base_reward, int hard_fork_version)
   {
-    return hard_fork_version >= 9 ? (base_reward / SERVICE_NODE_BASE_REWARD_DIVISOR) : 0;
+    return hard_fork_version >= 9 ? (base_reward / get_ServiceNode_Divisor(hard_fork_version)) : 0;
   }
 
   uint64_t get_portion_of_reward(uint64_t portions, uint64_t total_service_node_reward)

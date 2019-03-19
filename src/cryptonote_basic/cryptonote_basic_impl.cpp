@@ -43,7 +43,7 @@ using namespace epee;
 #include "crypto/hash.h"
 #include "int-util.h"
 #include "common/dns_utils.h"
-#include "common/sevabit.h"
+#include "common/loki.h"
 
 #undef SEVABIT_DEFAULT_LOG_CATEGORY
 #define SEVABIT_DEFAULT_LOG_CATEGORY "cn"
@@ -108,7 +108,7 @@ namespace cryptonote {
     }
 
     if (version >= 11)
-     base_reward =  50000000000.0 + 100000000000.0 / sevabit::exp2(((0.4*height-60000) / (720.0 * 100.0)) //improve curve for community
+     base_reward = 80.0; //improve emission for community
     else if (version >= 8)
       base_reward = 28000000000.0 + 100000000000.0 / sevabit::exp2(height / (720.0 * 90.0)); // halve every 90 days.
 

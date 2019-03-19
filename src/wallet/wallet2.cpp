@@ -80,7 +80,7 @@ using namespace epee;
 
 #include "cryptonote_core/service_node_list.h"
 #include "cryptonote_core/service_node_rules.h"
-#include "common/sevabit_integration_test_hooks.h"
+#include "common/loki_integration_test_hooks.h"
 
 extern "C"
 {

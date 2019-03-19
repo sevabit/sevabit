@@ -1,5 +1,5 @@
 #include "cryptonote_config.h"
-#include "common/sevabit.h"
+#include "common/loki.h"
 #include "int-util.h"
 #include <vector>
 #include <boost/lexical_cast.hpp>

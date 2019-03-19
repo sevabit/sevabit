@@ -1,12 +1,12 @@
 #include "scoped_message_writer.h"
 
 #define SEVABIT_INTEGRATION_TEST_HOOKS_IMPLEMENTATION
-#include "common/sevabit_integration_test_hooks.h"
+#include "common/loki_integration_test_hooks.h"
 
 // NOTE(sevabit): This file only exists because I need a way to hook into the
 // message writer for integration tests. Originally this was a header only file,
 // which means it needs to know the implementation of
-// sevabit_integration_test_hooks.h functions which isn't possible to expose in
+// loki_integration_test_hooks.h functions which isn't possible to expose in
 // just the header because of the One Definition Rule.
 //   - doyle 2018-11-08
 

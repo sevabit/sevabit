@@ -39,7 +39,7 @@
   #define PAUSE_READLINE()
 #endif
 
-#include "common/sevabit_integration_test_hooks.h"
+#include "common/loki_integration_test_hooks.h"
 
 namespace tools
 {

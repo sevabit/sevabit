@@ -37,7 +37,7 @@
 #include "string_tools.h"
 #include "version.h"
 
-#include "common/sevabit_integration_test_hooks.h"
+#include "common/loki_integration_test_hooks.h"
 
 #if defined(WIN32)
 #include <crtdbg.h>

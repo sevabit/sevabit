@@ -1,4 +1,4 @@
-#include "sevabit.h"
+#include "loki.h"
 #include <assert.h>
 
 /* Exponential base 2 function.

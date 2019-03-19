@@ -33,7 +33,7 @@
 #include "string_tools.h"
 #include "daemon/command_server.h"
 
-#include "common/sevabit_integration_test_hooks.h"
+#include "common/loki_integration_test_hooks.h"
 
 
 #undef SEVABIT_DEFAULT_LOG_CATEGORY

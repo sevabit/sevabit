@@ -37,7 +37,7 @@ using namespace epee;
 #include "common/command_line.h"
 #include "common/updates.h"
 #include "common/download.h"
-#include "common/sevabit.h"
+#include "common/loki.h"
 #include "common/util.h"
 #include "common/perf_timer.h"
 #include "cryptonote_basic/cryptonote_format_utils.h"
@@ -1993,7 +1993,7 @@ namespace cryptonote
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
-  bool core_rpc_server::on_get_peers(const COMMAND_RPC_GET_PEER_LIST_FULL::request& req, COMMAND_RPC_GET_PEER_LIST_FULL::response& res)
+  bool core_rpc_server::on_get_peers(const COMMAND_RPC_GET_PEER_LIST_FULL::request& req, COMMAND_RPC_GET_PEER_LIST_FULL::response& res, const connection_context *ctx)
   {
        // PRIMERO GUARDAS EN UNA VARIABLE EL MANAGER CON SU LISTA
       // PARA ESO LLAMO A LA FUNCION
@@ -2004,8 +2004,8 @@ namespace cryptonote
        // TIMER
       PERF_TIMER(on_get_peers);
        // DECLARO LAS 2 LISTAS
-      std::list<nodetool::peerlist_entry> white_list;
-      std::list<nodetool::peerlist_entry> gray_list;
+      std::vector<nodetool::peerlist_entry> white_list;
+      std::vector<nodetool::peerlist_entry> gray_list;
        // LE PASO LAS LISTAS AL MANAGER PARA QUE LOS LLENE
       m_p2p.get_peerlist_manager().get_peerlist_full(gray_list, white_list);
        // RECORRO LA LISTA BLANCA
@@ -2038,7 +2038,7 @@ namespace cryptonote
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
-  bool core_rpc_server::on_start_save_graph(const COMMAND_RPC_START_SAVE_GRAPH::request& req, COMMAND_RPC_START_SAVE_GRAPH::response& res)
+  bool core_rpc_server::on_start_save_graph(const COMMAND_RPC_START_SAVE_GRAPH::request& req, COMMAND_RPC_START_SAVE_GRAPH::response& res, const connection_context *ctx)
   {
 	  PERF_TIMER(on_start_save_graph);
 	  m_p2p.set_save_graph(true);

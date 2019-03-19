@@ -35,7 +35,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "common/sevabit.h"
+#include "common/loki.h"
 #include "int-util.h"
 #include "crypto/hash.h"
 #include "cryptonote_config.h"

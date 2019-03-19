@@ -33,7 +33,7 @@
 #include "cryptonote_core.h"
 #include "version.h"
 
-#include "common/sevabit_integration_test_hooks.h"
+#include "common/loki_integration_test_hooks.h"
 
 #undef SEVABIT_DEFAULT_LOG_CATEGORY
 #define SEVABIT_DEFAULT_LOG_CATEGORY "quorum_cop"

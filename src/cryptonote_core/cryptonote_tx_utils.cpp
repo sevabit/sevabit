@@ -192,7 +192,7 @@ namespace cryptonote
       snode_reward += output.amount;
     }
 
-    uint64_t base_reward  = snode_reward * get_ServiceNode_Divisor(b.major_version);
+    uint64_t base_reward  = snode_reward * get_ServiceNode_Divisor(block.major_version);
     uint64_t governance   = governance_reward_formula(base_reward);
     uint64_t block_reward = base_reward - governance;
 

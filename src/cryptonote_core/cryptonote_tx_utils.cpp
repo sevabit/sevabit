@@ -133,11 +133,11 @@ namespace cryptonote
     return correct_key == output_key;
   }
 
-  const uint64_t GOVERNANCE_BASE_REWARD_PERCENTAGE = 10;
+
   const uint64_t SERVICE_NODE_BASE_REWARD_PERCENTAGE_v1 = 40;
   const uint64_t SERVICE_NODE_BASE_REWARD_PERCENTAGE_v2 = 70;
   
-  const uint64_t GOVERNANCE_BASE_REWARD_DIVISOR   = 100 / GOVERNANCE_BASE_REWARD_PERCENTAGE ;
+  const int GOVERNANCE_BASE_REWARD_DIVISOR   = 10;
   const double SERVICE_NODE_BASE_REWARD_DIVISOR_v1 = 100.0 / SERVICE_NODE_BASE_REWARD_PERCENTAGE_v1;
   const double SERVICE_NODE_BASE_REWARD_DIVISOR_v2 = 100.0 / SERVICE_NODE_BASE_REWARD_PERCENTAGE_v2;
   
@@ -146,7 +146,7 @@ namespace cryptonote
         if (hard_fork_version >= 11)
             return SERVICE_NODE_BASE_REWARD_DIVISOR_v2;
         else
-            return SERVICE_NODE_BASE_REWARD_DIVISOR_v1;        
+            return 2.0; //governance reward was effective lower than planned because of this value      
   }
   
   uint64_t governance_reward_formula(uint64_t base_reward)

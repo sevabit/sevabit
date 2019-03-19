@@ -253,7 +253,7 @@ application.
 
 * Change to the cloned directory, run:
 	
-        cd ~/loki
+        cd ~/sevabit
 
 * **Optional**: if you would like a specific [version/tag](https://github.com/sevabit/sevabit/tags), do a git checkout for that version. eg. 'v2.0.3'. If you dont care about the version and just want binaries from master, skip this step:
 	
@@ -267,7 +267,7 @@ application.
 
         make release-static-win32
 
-* The resulting executables can be found in `build/<MinGW version>/<loki version>/release/bin`
+* The resulting executables can be found in `build/<MinGW version>/<sevabit version>/release/bin`
 
 * **Optional**: to build Windows binaries suitable for debugging on a 64-bit system, run:
 
@@ -277,7 +277,7 @@ application.
 
         make debug-static-win32
 
-* The resulting executables can be found in `build/<MinGW version>/<loki version>/debug/bin`
+* The resulting executables can be found in `build/<MinGW version>/<sevabit version>/debug/bin`
 
 ### On FreeBSD:
 
@@ -451,10 +451,10 @@ The produced binaries still link libc dynamically. If the binary is compiled on 
         docker build --build-arg NPROC=1 -t sevabit .
 
         # either run in foreground
-        docker run -it -v /loki/chain:/root/.loki -v /loki/wallet:/wallet -p 22048:22048 sevabit
+        docker run -it -v /sevabit/chain:/root/.sevabit -v /sevabit/wallet:/wallet -p 22048:22048 sevabit
 
         # or in background
-        docker run -it -d -v /loki/chain:/root/.loki -v /loki/wallet:/wallet -p 22048:22048 sevabit
+        docker run -it -d -v /sevabit/chain:/root/.sevabit -v /sevabit/wallet:/wallet -p 22048:22048 sevabit
 
 * The build needs 3 GB space.
 * Wait one  hour or more

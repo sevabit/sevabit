@@ -4251,7 +4251,6 @@ bool Blockchain::calc_batched_governance_reward(uint64_t height, uint64_t &rewar
     if (block.major_version >= network_version_10_bulletproofs)
       reward += derive_governance_from_block_reward(nettype(), block);
   }
-
   return true;
 }
 

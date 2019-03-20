@@ -213,7 +213,7 @@ namespace cryptonote
     uint64_t reward = 0;
     if(hard_fork_version >= 11)
         reward = (base_reward / 10) * (SERVICE_NODE_BASE_REWARD_PERCENTAGE_v2/10) ;
-    if(hard_fork_version == 10)
+    else if(hard_fork_version >= 9)
         reward = (base_reward / 10) * (SERVICE_NODE_BASE_REWARD_PERCENTAGE_v1/10) ;
     
     return reward;

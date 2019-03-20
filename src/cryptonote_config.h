@@ -338,9 +338,9 @@ namespace cryptonote
           mainnet.GOVERNANCE_REWARD_INTERVAL_IN_BLOCKS = 100;
         
         if (hard_fork_version <= network_version_10_bulletproofs)
-            mainnet.GOVERNANCE_WALLET_ADDRESS = &::config::testnet::GOVERNANCE_WALLET_ADDRESS[0];
+            mainnet.GOVERNANCE_WALLET_ADDRESS = &::config::GOVERNANCE_WALLET_ADDRESS[0];
         else
-            mainnet.GOVERNANCE_WALLET_ADDRESS = &::config::testnet::GOVERNANCE_WALLET_ADDRESS[1];
+            mainnet.GOVERNANCE_WALLET_ADDRESS = &::config::GOVERNANCE_WALLET_ADDRESS[1];
         return mainnet;
       }
 

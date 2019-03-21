@@ -10,11 +10,11 @@ Portions Copyright (c) 2012-2013 The Cryptonote developers.
 
 ## Development resources
 
-- Web: [sevabit.network](https://sevabit.network)
-- Telegram: [t.me/SevabitCommunity](https://t.me/SevabitCommunity)
-- Mail: [team@sevabit.network](mailto:team@sevabit.network)
+- Web: [sevabit.com](https://sevabit.com)
+- Telegram: [t.me/Sevabit](https://t.me/Sevabit)
+- Mail: [admin@sevabit.com](mailto:admin@sevabit.com)
 - GitHub: [https://github.com/sevabit/sevabit](https://github.com/sevabit/sevabit)
-- Discord: [https://discord.gg/67GXfD6](https://discord.gg/67GXfD6)
+- Discord: [https://discord.gg/MApcHzB](https://discord.gg/MApcHzB)
 
 ## Vulnerability disclosure
 
@@ -22,11 +22,11 @@ Portions Copyright (c) 2012-2013 The Cryptonote developers.
 
 ## Information
 
-Sevabit is a private cryptocurrency based on Monero. Sevabit currently offers an incentivised full node layer, over the coming months we will be looking to support a secondary p2p network (Sevabitnet) and a messenger that offers private communications based on the Signal protocol (Sevabit Messenger).
+Sevabit is a privacy-focused cryptocurrency based on Monero/Loki. Sevabit currently offers an incentivised full node layer, over the coming months we will be looking to support a secondary p2p network (Sevabitnet) and a messenger that offers private communications based on the Signal protocol (Sevabit Messenger).
 
 More information on the project can be found on the website and in the whitepaper.
 
-Sevabit is an open source project, and we encourage contributions from anyone with something to offer. For more information on contributing, please contact team@sevabit.network
+Sevabit is an open source project, and we encourage contributions from anyone with something to offer. For more information on contributing, please contact admin@sevabit.com
 
 ## Compiling Sevabit from source
 

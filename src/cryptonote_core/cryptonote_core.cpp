@@ -182,9 +182,9 @@ namespace cryptonote
   , "Set maximum txpool weight in bytes."
   , DEFAULT_TXPOOL_MAX_WEIGHT
   };
-  static const command_line::arg_descriptor<bool> arg_service_node  = {
-    "service-node"
-  , "Run as a service node"
+  static const command_line::arg_descriptor<bool> arg_super_node  = {
+    "super-node"
+  , "Run as a super node"
   };
   static const command_line::arg_descriptor<std::string> arg_block_notify = {
     "block-notify"
@@ -219,8 +219,8 @@ namespace cryptonote
   //-----------------------------------------------------------------------------------------------
   core::core(i_cryptonote_protocol* pprotocol):
               m_mempool(m_blockchain_storage),
-              m_service_node_list(m_blockchain_storage),
-              m_blockchain_storage(m_mempool, m_service_node_list, m_deregister_vote_pool),
+              m_super_node_list(m_blockchain_storage),
+              m_blockchain_storage(m_mempool, m_super_node_list, m_deregister_vote_pool),
               m_quorum_cop(*this),
               m_miner(this),
               m_miner_address(boost::value_initialized<account_public_address>()),
@@ -329,7 +329,7 @@ namespace cryptonote
     command_line::add_arg(desc, arg_disable_dns_checkpoints);
     command_line::add_arg(desc, arg_block_download_max_size);
     command_line::add_arg(desc, arg_max_txpool_weight);
-    command_line::add_arg(desc, arg_service_node);
+    command_line::add_arg(desc, arg_super_node);
     command_line::add_arg(desc, arg_pad_transactions);
     command_line::add_arg(desc, arg_block_notify);
     command_line::add_arg(desc, arg_prune_blockchain);
@@ -387,7 +387,7 @@ namespace cryptonote
     if (command_line::get_arg(vm, arg_test_drop_download) == true)
       test_drop_download();
 
-    m_service_node = command_line::get_arg(vm, arg_service_node);
+    m_super_node = command_line::get_arg(vm, arg_super_node);
 
     epee::debug::g_test_dbg_lock_sleep() = command_line::get_arg(vm, arg_test_dbg_lock_sleep);
 
@@ -510,11 +510,11 @@ namespace cryptonote
     size_t max_txpool_weight = command_line::get_arg(vm, arg_max_txpool_weight);
     bool prune_blockchain = command_line::get_arg(vm, arg_prune_blockchain);
 
-    if (m_service_node)
+    if (m_super_node)
     {
-      r = init_service_node_key();
-      CHECK_AND_ASSERT_MES(r, false, "Failed to create or load service node key");
-      m_service_node_list.set_my_service_node_keys(&m_service_node_pubkey);
+      r = init_super_node_key();
+      CHECK_AND_ASSERT_MES(r, false, "Failed to create or load super node key");
+      m_super_node_list.set_my_super_node_keys(&m_super_node_pubkey);
     }
 
     boost::filesystem::path folder(m_config_folder);
@@ -697,8 +697,8 @@ namespace cryptonote
     const difficulty_type fixed_difficulty = command_line::get_arg(vm, arg_fixed_difficulty);
 
     BlockchainDB *initialized_db = db.release();
-    m_service_node_list.set_db_pointer(initialized_db);
-    m_service_node_list.register_hooks(m_quorum_cop);
+    m_super_node_list.set_db_pointer(initialized_db);
+    m_super_node_list.register_hooks(m_quorum_cop);
     r = m_blockchain_storage.init(initialized_db, m_nettype, m_offline, regtest ? &regtest_test_options : test_options, fixed_difficulty, get_checkpoints);
 
     r = m_mempool.init(max_txpool_weight);
@@ -748,36 +748,36 @@ namespace cryptonote
     return load_state_data();
   }
   //-----------------------------------------------------------------------------------------------
-  bool core::init_service_node_key()
+  bool core::init_super_node_key()
   {
     std::string keypath = m_config_folder + "/key";
     if (epee::file_io_utils::is_file_exist(keypath))
     {
       std::string keystr;
       bool r = epee::file_io_utils::load_file_to_string(keypath, keystr);
-      memcpy(&unwrap(unwrap(m_service_node_key)), keystr.data(), sizeof(m_service_node_key));
+      memcpy(&unwrap(unwrap(m_super_node_key)), keystr.data(), sizeof(m_super_node_key));
       wipeable_string wipe(keystr);
-      CHECK_AND_ASSERT_MES(r, false, "failed to load service node key from file");
+      CHECK_AND_ASSERT_MES(r, false, "failed to load super node key from file");
 
-      r = crypto::secret_key_to_public_key(m_service_node_key, m_service_node_pubkey);
+      r = crypto::secret_key_to_public_key(m_super_node_key, m_super_node_pubkey);
       CHECK_AND_ASSERT_MES(r, false, "failed to generate pubkey from secret key");
     }
     else
     {
       cryptonote::keypair keypair = keypair::generate(hw::get_device("default"));
-      m_service_node_pubkey = keypair.pub;
-      m_service_node_key = keypair.sec;
+      m_super_node_pubkey = keypair.pub;
+      m_super_node_key = keypair.sec;
 
-      std::string keystr(reinterpret_cast<const char *>(&m_service_node_key), sizeof(m_service_node_key));
+      std::string keystr(reinterpret_cast<const char *>(&m_super_node_key), sizeof(m_super_node_key));
       bool r = epee::file_io_utils::save_string_to_file(keypath, keystr);
       wipeable_string wipe(keystr);
-      CHECK_AND_ASSERT_MES(r, false, "failed to save service node key to file");
+      CHECK_AND_ASSERT_MES(r, false, "failed to save super node key to file");
 
       using namespace boost::filesystem;
       permissions(keypath, owner_read);
     }
 
-    MGINFO_YELLOW("Service node pubkey is " << epee::string_tools::pod_to_hex(m_service_node_pubkey));
+    MGINFO_YELLOW("Super node pubkey is " << epee::string_tools::pod_to_hex(m_super_node_pubkey));
 
     return true;
   }
@@ -795,8 +795,8 @@ namespace cryptonote
   //-----------------------------------------------------------------------------------------------
   bool core::deinit()
   {
-    m_service_node_list.store();
-    m_service_node_list.set_db_pointer(nullptr);
+    m_super_node_list.store();
+    m_super_node_list.set_db_pointer(nullptr);
     m_miner.stop();
     m_mempool.deinit();
     m_blockchain_storage.deinit();
@@ -1354,7 +1354,7 @@ namespace cryptonote
   //-----------------------------------------------------------------------------------------------
   bool core::submit_uptime_proof()
   {
-    if (m_service_node)
+    if (m_super_node)
     {
       cryptonote_connection_context fake_context = AUTO_VAL_INIT(fake_context);
       NOTIFY_UPTIME_PROOF::request r;
@@ -1362,7 +1362,7 @@ namespace cryptonote
       bool relayed = get_protocol()->relay_uptime_proof(r, fake_context);
 
       if (relayed)
-        MGINFO("Submitted uptime-proof for service node (yours): " << m_service_node_pubkey);
+        MGINFO("Submitted uptime-proof for super node (yours): " << m_super_node_pubkey);
     }
     return true;
   }
@@ -1699,7 +1699,7 @@ namespace cryptonote
   void core::do_uptime_proof_call()
   {
     // wait one block before starting uptime proofs.
-    std::vector<service_nodes::service_node_pubkey_info> const states = get_service_node_list_state({ m_service_node_pubkey });
+    std::vector<super_nodes::super_node_pubkey_info> const states = get_super_node_list_state({ m_super_node_pubkey });
     if (!states.empty() && states[0].info.registration_height + 1 < get_current_blockchain_height())
     {
       // Code snippet from Github @Jagerman
@@ -1747,12 +1747,12 @@ namespace cryptonote
     m_block_rate_interval.do_call(boost::bind(&core::check_block_rate, this));
 
     time_t const lifetime = time(nullptr) - get_start_time();
-    if (m_service_node && lifetime > DIFFICULTY_TARGET_V2) // Give us some time to connect to peers before sending uptimes
+    if (m_super_node && lifetime > DIFFICULTY_TARGET_V2) // Give us some time to connect to peers before sending uptimes
     {
       do_uptime_proof_call();
     }
 
-    m_uptime_proof_pruner.do_call(boost::bind(&service_nodes::quorum_cop::prune_uptime_proof, &m_quorum_cop));
+    m_uptime_proof_pruner.do_call(boost::bind(&super_nodes::quorum_cop::prune_uptime_proof, &m_quorum_cop));
 
     m_blockchain_pruning_interval.do_call(boost::bind(&core::update_blockchain_pruning, this));
     m_miner.on_idle();
@@ -2040,45 +2040,45 @@ namespace cryptonote
     return si.available;
   }
   //-----------------------------------------------------------------------------------------------
-  const std::shared_ptr<const service_nodes::quorum_state> core::get_quorum_state(uint64_t height) const
+  const std::shared_ptr<const super_nodes::quorum_state> core::get_quorum_state(uint64_t height) const
   {
-    return m_service_node_list.get_quorum_state(height);
+    return m_super_node_list.get_quorum_state(height);
   }
   //-----------------------------------------------------------------------------------------------
-  bool core::is_service_node(const crypto::public_key& pubkey) const
+  bool core::is_super_node(const crypto::public_key& pubkey) const
   {
-    return m_service_node_list.is_service_node(pubkey);
+    return m_super_node_list.is_super_node(pubkey);
   }
   //-----------------------------------------------------------------------------------------------
-  const std::vector<service_nodes::key_image_blacklist_entry> &core::get_service_node_blacklisted_key_images() const
+  const std::vector<super_nodes::key_image_blacklist_entry> &core::get_super_node_blacklisted_key_images() const
   {
-    const auto &result = m_service_node_list.get_blacklisted_key_images();
+    const auto &result = m_super_node_list.get_blacklisted_key_images();
     return result;
   }
   //-----------------------------------------------------------------------------------------------
-  std::vector<service_nodes::service_node_pubkey_info> core::get_service_node_list_state(const std::vector<crypto::public_key> &service_node_pubkeys) const
+  std::vector<super_nodes::super_node_pubkey_info> core::get_super_node_list_state(const std::vector<crypto::public_key> &super_node_pubkeys) const
   {
-    std::vector<service_nodes::service_node_pubkey_info> result = m_service_node_list.get_service_node_list_state(service_node_pubkeys);
+    std::vector<super_nodes::super_node_pubkey_info> result = m_super_node_list.get_super_node_list_state(super_node_pubkeys);
     return result;
   }
   //-----------------------------------------------------------------------------------------------
-  bool core::add_deregister_vote(const service_nodes::deregister_vote& vote, vote_verification_context &vvc)
+  bool core::add_deregister_vote(const super_nodes::deregister_vote& vote, vote_verification_context &vvc)
   {
     uint64_t latest_block_height = std::max(get_current_blockchain_height(), get_target_blockchain_height());
     uint64_t delta_height = latest_block_height - vote.block_height;
 
-    if (vote.block_height < latest_block_height && delta_height >= service_nodes::deregister_vote::VOTE_LIFETIME_BY_HEIGHT)
+    if (vote.block_height < latest_block_height && delta_height >= super_nodes::deregister_vote::VOTE_LIFETIME_BY_HEIGHT)
     {
       LOG_PRINT_L1("Received vote for height: " << vote.block_height
-                << " and service node: "     << vote.service_node_index
-                << ", is older than: "       << service_nodes::deregister_vote::VOTE_LIFETIME_BY_HEIGHT
+                << " and super node: "     << vote.super_node_index
+                << ", is older than: "       << super_nodes::deregister_vote::VOTE_LIFETIME_BY_HEIGHT
                 << " blocks and has been rejected.");
       vvc.m_invalid_block_height = true;
     }
     else if (vote.block_height > latest_block_height)
     {
       LOG_PRINT_L1("Received vote for height: " << vote.block_height
-                << " and service node: "     << vote.service_node_index
+                << " and super node: "     << vote.super_node_index
                 << ", is newer than: "       << latest_block_height
                 << " (latest block height) and has been rejected.");
       vvc.m_invalid_block_height = true;
@@ -2090,7 +2090,7 @@ namespace cryptonote
       return false;
     }
 
-    const auto quorum_state = m_service_node_list.get_quorum_state(vote.block_height);
+    const auto quorum_state = m_super_node_list.get_quorum_state(vote.block_height);
     if (!quorum_state)
     {
       vvc.m_verification_failed  = true;
@@ -2110,7 +2110,7 @@ namespace cryptonote
       if (!result || tvc.m_verifivation_failed)
       {
         LOG_PRINT_L1("A full deregister tx for height: " << vote.block_height <<
-                     " and service node: " << vote.service_node_index <<
+                     " and super node: " << vote.super_node_index <<
                      " could not be verified and was not added to the memory pool, reason: " <<
                      print_tx_verification_context(tvc, &deregister_tx));
       }
@@ -2119,14 +2119,14 @@ namespace cryptonote
     return result;
   }
   //-----------------------------------------------------------------------------------------------
-  bool core::get_service_node_keys(crypto::public_key &pub_key, crypto::secret_key &sec_key) const
+  bool core::get_super_node_keys(crypto::public_key &pub_key, crypto::secret_key &sec_key) const
   {
-    if (m_service_node)
+    if (m_super_node)
     {
-      pub_key = m_service_node_pubkey;
-      sec_key = m_service_node_key;
+      pub_key = m_super_node_pubkey;
+      sec_key = m_super_node_key;
     }
-    return m_service_node;
+    return m_super_node;
   }
   uint32_t core::get_blockchain_pruning_seed() const
   {
@@ -2138,9 +2138,9 @@ namespace cryptonote
     return get_blockchain_storage().prune_blockchain(pruning_seed);
   }
   //-----------------------------------------------------------------------------------------------
-  void core::get_all_service_nodes_public_keys(std::vector<crypto::public_key>& keys, bool fully_funded_nodes_only) const
+  void core::get_all_super_nodes_public_keys(std::vector<crypto::public_key>& keys, bool fully_funded_nodes_only) const
   {
-    m_service_node_list.get_all_service_nodes_public_keys(keys, fully_funded_nodes_only);
+    m_super_node_list.get_all_super_nodes_public_keys(keys, fully_funded_nodes_only);
   }
   //-----------------------------------------------------------------------------------------------
   std::time_t core::get_start_time() const

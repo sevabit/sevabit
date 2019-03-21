@@ -106,12 +106,12 @@ struct event_visitor_settings
 {
   int valid_mask;
   bool txs_keeped_by_block;
-  crypto::secret_key service_node_key;
+  crypto::secret_key super_node_key;
 
   enum settings
   {
     set_txs_keeped_by_block = 1 << 0,
-    set_service_node_key = 1 << 1
+    set_super_node_key = 1 << 1
   };
 
   event_visitor_settings(int a_valid_mask = 0, bool a_txs_keeped_by_block = false)
@@ -120,10 +120,10 @@ struct event_visitor_settings
   {
   }
 
-  static event_visitor_settings make_set_service_node_key(const crypto::secret_key& a_service_node_key)
+  static event_visitor_settings make_set_super_node_key(const crypto::secret_key& a_super_node_key)
   {
-    event_visitor_settings settings(set_service_node_key);
-    settings.service_node_key = a_service_node_key;
+    event_visitor_settings settings(set_super_node_key);
+    settings.super_node_key = a_super_node_key;
     return settings;
   }
 
@@ -135,7 +135,7 @@ private:
   {
     ar & valid_mask;
     ar & txs_keeped_by_block;
-    ar & service_node_key;
+    ar & super_node_key;
   }
 };
 
@@ -234,7 +234,7 @@ private:
   std::unordered_map<crypto::hash, block_info> m_blocks_info;
 };
 
-/// ------------ Service Nodes -----------
+/// ------------ Super Nodes -----------
 
 struct last_reward_point {
   uint64_t height;
@@ -272,10 +272,10 @@ public:
 
 };
 
-/// Service node and its index
+/// Super node and its index
 struct sn_idx {
   crypto::public_key sn_pk;
-  /// index in the sorted list of service nodes for a particular block
+  /// index in the sorted list of super nodes for a particular block
   size_t idx_in_quorum;
 };
 
@@ -341,7 +341,7 @@ class linear_chain_generator
     /// Note: should be carefull with returing a reference to vector elements
     const cryptonote::block& chain_head() const { return blocks_.back(); }
 
-    /// get a copy of the service node list
+    /// get a copy of the super node list
     sn_list get_sn_list() const { return sn_list_; }
 
     void set_sn_list(const sn_list& list) { sn_list_ = list; }
@@ -936,7 +936,7 @@ inline bool do_replay_file(const std::string& filename)
 
 cryptonote::transaction make_registration_tx(std::vector<test_event_entry>& events,
                                              const cryptonote::account_base& account,
-                                             const cryptonote::keypair& service_node_keys,
+                                             const cryptonote::keypair& super_node_keys,
                                              uint64_t operator_cut,
                                              const std::vector<cryptonote::account_public_address>& addresses,
                                              const std::vector<uint64_t>& portions,
@@ -945,7 +945,7 @@ cryptonote::transaction make_registration_tx(std::vector<test_event_entry>& even
 
 cryptonote::transaction make_default_registration_tx(std::vector<test_event_entry>& events,
                                                      const cryptonote::account_base& account,
-                                                     const cryptonote::keypair& service_node_keys,
+                                                     const cryptonote::keypair& super_node_keys,
                                                      const cryptonote::block& head,
                                                      uint8_t hf_version);
 
@@ -953,7 +953,7 @@ cryptonote::transaction make_default_registration_tx(std::vector<test_event_entr
 cryptonote::transaction make_deregistration_tx(const std::vector<test_event_entry>& events,
                                                const cryptonote::account_base& account,
                                                const cryptonote::block& head,
-                                               const cryptonote::tx_extra_service_node_deregister& deregister, uint8_t hf_version, uint64_t fee);
+                                               const cryptonote::tx_extra_super_node_deregister& deregister, uint8_t hf_version, uint64_t fee);
 
 // NOTE(sevabit): These macros assume hardfork version 7 and are from the old Monero testing code
 #define MAKE_TX_MIX(VEC_EVENTS, TX_NAME, FROM, TO, AMOUNT, NMIX, HEAD)                       \

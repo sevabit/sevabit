@@ -41,15 +41,15 @@ namespace cryptonote
   bool     get_deterministic_output_key         (const account_public_address& address, const keypair& tx_key, size_t output_index, crypto::public_key& output_key);
   bool     validate_governance_reward_key       (uint64_t height, const std::string& governance_wallet_address_str, size_t output_index, const crypto::public_key& output_key, const cryptonote::network_type nettype);
 
-  double   get_ServiceNode_Divisor              (const int hard_fork_version);
+  double   get_SuperNode_Divisor              (const int hard_fork_version);
   uint64_t governance_reward_formula            (uint64_t base_reward);
   bool     block_has_governance_output          (network_type nettype, cryptonote::block const &block);
   bool     height_has_governance_output         (network_type nettype, int hard_fork_version, uint64_t height);
   uint64_t derive_governance_from_block_reward  (network_type nettype, const cryptonote::block &block);
   
 
-  uint64_t get_portion_of_reward                (uint64_t portions, uint64_t total_service_node_reward);
-  uint64_t service_node_reward_formula          (uint64_t base_reward, int hard_fork_version);
+  uint64_t get_portion_of_reward                (uint64_t portions, uint64_t total_super_node_reward);
+  uint64_t super_node_reward_formula          (uint64_t base_reward, int hard_fork_version);
 
   struct sevabit_miner_tx_context // NOTE(sevabit): All the custom fields required by Sevabit to use construct_miner_tx
   {
@@ -61,7 +61,7 @@ namespace cryptonote
 
     network_type                                                   nettype;
     crypto::public_key                                             snode_winner_key;
-    std::vector<std::pair<account_public_address, stake_portions>> snode_winner_info;  // NOTE: If empty we use service_nodes::null_winner
+    std::vector<std::pair<account_public_address, stake_portions>> snode_winner_info;  // NOTE: If empty we use super_nodes::null_winner
     uint64_t                                                       batched_governance; // NOTE: 0 until hardfork v10, then use blockchain::calc_batched_governance_reward
   };
 
@@ -79,8 +79,8 @@ namespace cryptonote
 
   struct block_reward_parts
   {
-    uint64_t service_node_total;
-    uint64_t service_node_paid;
+    uint64_t super_node_total;
+    uint64_t super_node_paid;
 
     uint64_t governance;
     uint64_t base_miner;
@@ -89,7 +89,7 @@ namespace cryptonote
     // NOTE: Post hardfork 10, adjusted base reward is the block reward with the
     // governance amount removed. We still need the original base reward, so
     // that we can calculate the 50% on the whole base amount, that should be
-    // allocated for the service node and fees.
+    // allocated for the super node and fees.
 
     // If this block contains the batched governance payment, this is
     // included in the adjusted base reward.
@@ -107,7 +107,7 @@ namespace cryptonote
     uint64_t                                                 height;
     uint64_t                                                 fee;
     uint64_t                                                 batched_governance; // Optional: 0 hardfork v10, then must be calculated using blockchain::calc_batched_governance_reward
-    std::vector<std::pair<account_public_address, portions>> snode_winner_info;  // Optional: Check contributor portions add up, else set empty to use service_nodes::null_winner
+    std::vector<std::pair<account_public_address, portions>> snode_winner_info;  // Optional: Check contributor portions add up, else set empty to use super_nodes::null_winner
   };
 
   // NOTE(sevabit): I would combine this into get_base_block_reward, but
@@ -191,7 +191,7 @@ namespace cryptonote
     {
       *this = {};
       v4_allow_tx_types    = (hf_version >= cryptonote::network_version_11_infinite_staking);
-      v3_per_output_unlock = (hf_version >= cryptonote::network_version_9_service_nodes);
+      v3_per_output_unlock = (hf_version >= cryptonote::network_version_9_super_nodes);
       v2_rct               = (hf_version >= cryptonote::network_version_7);
     }
   };

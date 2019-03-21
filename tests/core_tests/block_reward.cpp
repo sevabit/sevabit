@@ -298,7 +298,7 @@ bool gen_batched_governance_reward::generate(std::vector<test_event_entry>& even
     // problems
     std::vector<test_event_entry> unused_events;
     linear_chain_generator no_batched_governance_generator(unused_events, test_options.hard_forks);
-    no_batched_governance_generator.rewind_until_version(network_version_9_service_nodes);
+    no_batched_governance_generator.rewind_until_version(network_version_9_super_nodes);
 
     while(no_batched_governance_generator.height() < batched_governance_generator.height())
       no_batched_governance_generator.create_block();

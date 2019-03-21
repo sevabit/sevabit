@@ -37,25 +37,25 @@
 #include "int-util.h"
 #include "common/scoped_message_writer.h"
 #include "common/i18n.h"
-#include "service_node_quorum_cop.h"
+#include "super_node_quorum_cop.h"
 
-#include "service_node_list.h"
-#include "service_node_rules.h"
+#include "super_node_list.h"
+#include "super_node_rules.h"
 
 #undef SEVABIT_DEFAULT_LOG_CATEGORY
-#define SEVABIT_DEFAULT_LOG_CATEGORY "service_nodes"
+#define SEVABIT_DEFAULT_LOG_CATEGORY "super_nodes"
 
-namespace service_nodes
+namespace super_nodes
 {
-  static int get_min_service_node_info_version_for_hf(int hf_version)
+  static int get_min_super_node_info_version_for_hf(int hf_version)
   {
-    if (hf_version >= cryptonote::network_version_7 && hf_version <= cryptonote::network_version_9_service_nodes)
-      return service_node_info::version_0;
+    if (hf_version >= cryptonote::network_version_7 && hf_version <= cryptonote::network_version_9_super_nodes)
+      return super_node_info::version_0;
 
     if (hf_version == cryptonote::network_version_10_bulletproofs)
-      return service_node_info::version_1_swarms;
+      return super_node_info::version_1_swarms;
 
-    return service_node_info::version_2_infinite_staking;
+    return super_node_info::version_2_infinite_staking;
   }
 
   static uint64_t uniform_distribution_portable(std::mt19937_64& mersenne_twister, uint64_t n)
@@ -66,12 +66,12 @@ namespace service_nodes
     return  x / (secureMax / n);
   }
 
-  service_node_list::service_node_list(cryptonote::Blockchain& blockchain)
-    : m_blockchain(blockchain), m_hooks_registered(false), m_height(0), m_db(nullptr), m_service_node_pubkey(nullptr)
+  super_node_list::super_node_list(cryptonote::Blockchain& blockchain)
+    : m_blockchain(blockchain), m_hooks_registered(false), m_height(0), m_db(nullptr), m_super_node_pubkey(nullptr)
   {
   }
 
-  void service_node_list::register_hooks(service_nodes::quorum_cop &quorum_cop)
+  void super_node_list::register_hooks(super_nodes::quorum_cop &quorum_cop)
   {
     std::lock_guard<boost::recursive_mutex> lock(m_sn_mutex);
     if (!m_hooks_registered)
@@ -82,14 +82,14 @@ namespace service_nodes
       m_blockchain.hook_init(*this);
       m_blockchain.hook_validate_miner_tx(*this);
 
-      // NOTE: There is an implicit dependency on service node lists hooks
+      // NOTE: There is an implicit dependency on super node lists hooks
       m_blockchain.hook_init(quorum_cop);
       m_blockchain.hook_block_added(quorum_cop);
       m_blockchain.hook_blockchain_detached(quorum_cop);
     }
   }
 
-  void service_node_list::init()
+  void super_node_list::init()
   {
     std::lock_guard<boost::recursive_mutex> lock(m_sn_mutex);
     if (m_blockchain.get_current_hard_fork_version() < 9)
@@ -104,7 +104,7 @@ namespace service_nodes
 
     if (!loaded || m_height > current_height) clear(true);
 
-    LOG_PRINT_L0("Recalculating service nodes list, scanning blockchain from height " << m_height);
+    LOG_PRINT_L0("Recalculating super nodes list, scanning blockchain from height " << m_height);
     LOG_PRINT_L0("This may take some time...");
 
     std::vector<std::pair<cryptonote::blobdata, cryptonote::block>> blocks;
@@ -113,7 +113,7 @@ namespace service_nodes
       blocks.clear();
       if (!m_blockchain.get_blocks(m_height, 1000, blocks))
       {
-        MERROR("Unable to initialize service nodes list");
+        MERROR("Unable to initialize super nodes list");
         return;
       }
 
@@ -138,10 +138,10 @@ namespace service_nodes
     }
   }
 
-  std::vector<crypto::public_key> service_node_list::get_service_nodes_pubkeys() const
+  std::vector<crypto::public_key> super_node_list::get_super_nodes_pubkeys() const
   {
     std::vector<crypto::public_key> result;
-    for (const auto& iter : m_service_nodes_infos)
+    for (const auto& iter : m_super_nodes_infos)
       if (iter.second.is_fully_funded())
         result.push_back(iter.first);
 
@@ -152,7 +152,7 @@ namespace service_nodes
     return result;
   }
 
-  const std::shared_ptr<const quorum_state> service_node_list::get_quorum_state(uint64_t height) const
+  const std::shared_ptr<const quorum_state> super_node_list::get_quorum_state(uint64_t height) const
   {
     std::lock_guard<boost::recursive_mutex> lock(m_sn_mutex);
     const auto &it = m_quorum_states.find(height);
@@ -164,18 +164,18 @@ namespace service_nodes
     return nullptr;
   }
 
-  std::vector<service_node_pubkey_info> service_node_list::get_service_node_list_state(const std::vector<crypto::public_key> &service_node_pubkeys) const
+  std::vector<super_node_pubkey_info> super_node_list::get_super_node_list_state(const std::vector<crypto::public_key> &super_node_pubkeys) const
   {
     std::lock_guard<boost::recursive_mutex> lock(m_sn_mutex);
-    std::vector<service_node_pubkey_info> result;
+    std::vector<super_node_pubkey_info> result;
 
-    if (service_node_pubkeys.empty())
+    if (super_node_pubkeys.empty())
     {
-      result.reserve(m_service_nodes_infos.size());
+      result.reserve(m_super_nodes_infos.size());
 
-      for (const auto &it : m_service_nodes_infos)
+      for (const auto &it : m_super_nodes_infos)
       {
-        service_node_pubkey_info entry = {};
+        super_node_pubkey_info entry = {};
         entry.pubkey                   = it.first;
         entry.info                     = it.second;
         result.push_back(entry);
@@ -183,14 +183,14 @@ namespace service_nodes
     }
     else
     {
-      result.reserve(service_node_pubkeys.size());
-      for (const auto &it : service_node_pubkeys)
+      result.reserve(super_node_pubkeys.size());
+      for (const auto &it : super_node_pubkeys)
       {
-        const auto &find_it = m_service_nodes_infos.find(it);
-        if (find_it == m_service_nodes_infos.end())
+        const auto &find_it = m_super_nodes_infos.find(it);
+        if (find_it == m_super_nodes_infos.end())
           continue;
 
-        service_node_pubkey_info entry = {};
+        super_node_pubkey_info entry = {};
         entry.pubkey                   = (*find_it).first;
         entry.info                     = (*find_it).second;
         result.push_back(entry);
@@ -200,32 +200,32 @@ namespace service_nodes
     return result;
   }
 
-  void service_node_list::set_db_pointer(cryptonote::BlockchainDB* db)
+  void super_node_list::set_db_pointer(cryptonote::BlockchainDB* db)
   {
     std::lock_guard<boost::recursive_mutex> lock(m_sn_mutex);
     m_db = db;
   }
 
-  void service_node_list::set_my_service_node_keys(crypto::public_key const *pub_key)
+  void super_node_list::set_my_super_node_keys(crypto::public_key const *pub_key)
   {
     std::lock_guard<boost::recursive_mutex> lock(m_sn_mutex);
-    m_service_node_pubkey = pub_key;
+    m_super_node_pubkey = pub_key;
   }
 
-  bool service_node_list::is_service_node(const crypto::public_key& pubkey) const
+  bool super_node_list::is_super_node(const crypto::public_key& pubkey) const
   {
     std::lock_guard<boost::recursive_mutex> lock(m_sn_mutex);
-    return m_service_nodes_infos.find(pubkey) != m_service_nodes_infos.end();
+    return m_super_nodes_infos.find(pubkey) != m_super_nodes_infos.end();
   }
 
-  bool service_node_list::is_key_image_locked(crypto::key_image const &check_image, uint64_t *unlock_height, service_node_info::contribution_t *the_locked_contribution) const
+  bool super_node_list::is_key_image_locked(crypto::key_image const &check_image, uint64_t *unlock_height, super_node_info::contribution_t *the_locked_contribution) const
   {
-    for (const auto& pubkey_info : m_service_nodes_infos)
+    for (const auto& pubkey_info : m_super_nodes_infos)
     {
-      const service_node_info &info = pubkey_info.second;
-      for (const service_node_info::contributor_t &contributor : info.contributors)
+      const super_node_info &info = pubkey_info.second;
+      for (const super_node_info::contributor_t &contributor : info.contributors)
       {
-        for (const service_node_info::contribution_t &contribution : contributor.locked_contributions)
+        for (const super_node_info::contribution_t &contribution : contributor.locked_contributions)
         {
           if (check_image == contribution.key_image)
           {
@@ -239,12 +239,12 @@ namespace service_nodes
     return false;
   }
 
-  bool reg_tx_extract_fields(const cryptonote::transaction& tx, std::vector<cryptonote::account_public_address>& addresses, uint64_t& portions_for_operator, std::vector<uint64_t>& portions, uint64_t& expiration_timestamp, crypto::public_key& service_node_key, crypto::signature& signature)
+  bool reg_tx_extract_fields(const cryptonote::transaction& tx, std::vector<cryptonote::account_public_address>& addresses, uint64_t& portions_for_operator, std::vector<uint64_t>& portions, uint64_t& expiration_timestamp, crypto::public_key& super_node_key, crypto::signature& signature)
   {
-    cryptonote::tx_extra_service_node_register registration;
-    if (!get_service_node_register_from_tx_extra(tx.extra, registration))
+    cryptonote::tx_extra_super_node_register registration;
+    if (!get_super_node_register_from_tx_extra(tx.extra, registration))
       return false;
-    if (!cryptonote::get_service_node_pubkey_from_tx_extra(tx.extra, service_node_key))
+    if (!cryptonote::get_super_node_pubkey_from_tx_extra(tx.extra, super_node_key))
       return false;
 
     addresses.clear();
@@ -255,7 +255,7 @@ namespace service_nodes
     portions_for_operator = registration.m_portions_for_operator;
     portions = registration.m_portions;
     expiration_timestamp = registration.m_expiration_timestamp;
-    signature = registration.m_service_node_signature;
+    signature = registration.m_super_node_signature;
     return true;
   }
 
@@ -264,7 +264,7 @@ namespace service_nodes
     cryptonote::account_public_address address;
     uint64_t transferred;
     crypto::secret_key tx_key;
-    std::vector<service_node_info::contribution_t> locked_contributions;
+    std::vector<super_node_info::contribution_t> locked_contributions;
   };
 
   static uint64_t get_reg_tx_staking_output_contribution(const cryptonote::transaction& tx, int i, crypto::key_derivation const &derivation, hw::device& hwdev)
@@ -305,13 +305,13 @@ namespace service_nodes
     return money_transferred;
   }
 
-  bool service_node_list::process_deregistration_tx(const cryptonote::transaction& tx, uint64_t block_height)
+  bool super_node_list::process_deregistration_tx(const cryptonote::transaction& tx, uint64_t block_height)
   {
     if (tx.get_type() != cryptonote::transaction::type_deregister)
       return false;
 
-    cryptonote::tx_extra_service_node_deregister deregister;
-    if (!cryptonote::get_service_node_deregister_from_tx_extra(tx.extra, deregister))
+    cryptonote::tx_extra_super_node_deregister deregister;
+    if (!cryptonote::get_super_node_deregister_from_tx_extra(tx.extra, deregister))
     {
       MERROR("Transaction deregister did not have deregister data in tx extra, possibly corrupt tx in blockchain");
       return false;
@@ -326,25 +326,25 @@ namespace service_nodes
       return false;
     }
 
-    if (deregister.service_node_index >= state->nodes_to_test.size())
+    if (deregister.super_node_index >= state->nodes_to_test.size())
     {
-      MERROR("Service node index to vote off has become invalid, quorum rules have changed without a hardfork.");
+      MERROR("Super node index to vote off has become invalid, quorum rules have changed without a hardfork.");
       return false;
     }
 
-    const crypto::public_key& key = state->nodes_to_test[deregister.service_node_index];
+    const crypto::public_key& key = state->nodes_to_test[deregister.super_node_index];
 
-    auto iter = m_service_nodes_infos.find(key);
-    if (iter == m_service_nodes_infos.end())
+    auto iter = m_super_nodes_infos.find(key);
+    if (iter == m_super_nodes_infos.end())
       return false;
 
-    if (m_service_node_pubkey && *m_service_node_pubkey == key)
+    if (m_super_node_pubkey && *m_super_node_pubkey == key)
     {
-      MGINFO_RED("Deregistration for service node (yours): " << key);
+      MGINFO_RED("Deregistration for super node (yours): " << key);
     }
     else
     {
-      LOG_PRINT_L1("Deregistration for service node: " << key);
+      LOG_PRINT_L1("Deregistration for super node: " << key);
     }
 
     m_rollback_events.push_back(std::unique_ptr<rollback_event>(new rollback_change(block_height, key, iter->second)));
@@ -367,7 +367,7 @@ namespace service_nodes
       }
     }
 
-    m_service_nodes_infos.erase(iter);
+    m_super_nodes_infos.erase(iter);
     return true;
   }
 
@@ -535,7 +535,7 @@ namespace service_nodes
     swarm_to_snodes.insert({QUEUE_SWARM_ID, std::move(swarm_buffer)});
   }
 
-  void service_node_list::update_swarms(uint64_t height) {
+  void super_node_list::update_swarms(uint64_t height) {
 
     crypto::hash hash = m_blockchain.get_block_id_by_height(height);
     uint64_t seed = 0;
@@ -544,7 +544,7 @@ namespace service_nodes
     /// Gather existing swarms from infos
     std::map<swarm_id_t, std::vector<crypto::public_key>> existing_swarms;
 
-    for (const auto& entry : m_service_nodes_infos) {
+    for (const auto& entry : m_super_nodes_infos) {
       const auto id = entry.second.swarm_id;
       existing_swarms[id].push_back(entry.first);
     }
@@ -559,7 +559,7 @@ namespace service_nodes
 
       for (const auto snode : snodes) {
 
-        auto& sn_info = m_service_nodes_infos.at(snode);
+        auto& sn_info = m_super_nodes_infos.at(snode);
         if (sn_info.swarm_id == swarm_id) continue; /// nothing changed for this snode
 
         /// modify info and record the change
@@ -572,12 +572,12 @@ namespace service_nodes
 
   static bool get_contribution(cryptonote::network_type nettype, int hard_fork_version, const cryptonote::transaction& tx, uint64_t block_height, parsed_tx_contribution &parsed_contribution)
   {
-    if (!cryptonote::get_service_node_contributor_from_tx_extra(tx.extra, parsed_contribution.address))
+    if (!cryptonote::get_super_node_contributor_from_tx_extra(tx.extra, parsed_contribution.address))
       return false;
 
     if (!cryptonote::get_tx_secret_key_from_tx_extra(tx.extra, parsed_contribution.tx_key))
     {
-      LOG_PRINT_L1("Contribution TX: There was a service node contributor but no secret key in the tx extra on height: " << block_height << " for tx: " << get_transaction_hash(tx));
+      LOG_PRINT_L1("Contribution TX: There was a super node contributor but no secret key in the tx extra on height: " << block_height << " for tx: " << get_transaction_hash(tx));
       return false;
     }
 
@@ -628,7 +628,7 @@ namespace service_nodes
           if (!crypto::check_ring_signature((const crypto::hash &)(proof->key_image), proof->key_image, &ephemeral_pub_key_ptr, 1, &proof->signature))
             continue;
 
-          service_node_info::contribution_t entry = {};
+          super_node_info::contribution_t entry = {};
           entry.key_image_pub_key                 = ephemeral_pub_key;
           entry.key_image                         = proof->key_image;
           entry.amount                            = transferred;
@@ -662,22 +662,22 @@ namespace service_nodes
     return true;
   }
 
-  bool service_node_list::is_registration_tx(const cryptonote::transaction& tx, uint64_t block_timestamp, uint64_t block_height, uint32_t index, crypto::public_key& key, service_node_info& info) const
+  bool super_node_list::is_registration_tx(const cryptonote::transaction& tx, uint64_t block_timestamp, uint64_t block_height, uint32_t index, crypto::public_key& key, super_node_info& info) const
   {
-    crypto::public_key service_node_key;
-    std::vector<cryptonote::account_public_address> service_node_addresses;
-    std::vector<uint64_t> service_node_portions;
+    crypto::public_key super_node_key;
+    std::vector<cryptonote::account_public_address> super_node_addresses;
+    std::vector<uint64_t> super_node_portions;
     uint64_t portions_for_operator;
     uint64_t expiration_timestamp;
     crypto::signature signature;
 
-    if (!reg_tx_extract_fields(tx, service_node_addresses, portions_for_operator, service_node_portions, expiration_timestamp, service_node_key, signature))
+    if (!reg_tx_extract_fields(tx, super_node_addresses, portions_for_operator, super_node_portions, expiration_timestamp, super_node_key, signature))
       return false;
 
-    if (service_node_portions.size() != service_node_addresses.size() || service_node_portions.empty())
+    if (super_node_portions.size() != super_node_addresses.size() || super_node_portions.empty())
     {
-      LOG_PRINT_L1("Register TX: Extracted portions size: (" << service_node_portions.size() <<
-                   ") was empty or did not match address size: (" << service_node_addresses.size() <<
+      LOG_PRINT_L1("Register TX: Extracted portions size: (" << super_node_portions.size() <<
+                   ") was empty or did not match address size: (" << super_node_addresses.size() <<
                    ") on height: " << block_height <<
                    " for tx: " << cryptonote::get_transaction_hash(tx));
       return false;
@@ -685,7 +685,7 @@ namespace service_nodes
 
     int hf_version = m_blockchain.get_hard_fork_version(block_height);
 
-    if (!check_service_node_portions(hf_version, service_node_portions)) return false;
+    if (!check_super_node_portions(hf_version, super_node_portions)) return false;
 
     if (portions_for_operator > STAKING_PORTIONS)
     {
@@ -699,13 +699,13 @@ namespace service_nodes
     // check the signature is all good
 
     crypto::hash hash;
-    if (!get_registration_hash(service_node_addresses, portions_for_operator, service_node_portions, expiration_timestamp, hash))
+    if (!get_registration_hash(super_node_addresses, portions_for_operator, super_node_portions, expiration_timestamp, hash))
     {
       LOG_PRINT_L1("Register TX: Failed to extract registration hash, on height: " << block_height << " for tx: " << cryptonote::get_transaction_hash(tx));
       return false;
     }
 
-    if (!crypto::check_key(service_node_key) || !crypto::check_signature(hash, service_node_key, signature))
+    if (!crypto::check_key(super_node_key) || !crypto::check_signature(hash, super_node_key, signature))
     {
       LOG_PRINT_L1("Register TX: Has invalid key and/or signature, on height: " << block_height << " for tx: " << cryptonote::get_transaction_hash(tx));
       return false;
@@ -729,7 +729,7 @@ namespace service_nodes
     parsed_tx_contribution parsed_contribution = {};
     if (!get_contribution(m_blockchain.nettype(), hf_version, tx, block_height, parsed_contribution))
     {
-      LOG_PRINT_L1("Register TX: Had service node registration fields, but could not decode contribution on height: " << block_height << " for tx: " << cryptonote::get_transaction_hash(tx));
+      LOG_PRINT_L1("Register TX: Had super node registration fields, but could not decode contribution on height: " << block_height << " for tx: " << cryptonote::get_transaction_hash(tx));
       return false;
     }
 
@@ -740,8 +740,8 @@ namespace service_nodes
       return false;
     }
 
-    size_t total_num_of_addr = service_node_addresses.size();
-    if (std::find(service_node_addresses.begin(), service_node_addresses.end(), parsed_contribution.address) == service_node_addresses.end())
+    size_t total_num_of_addr = super_node_addresses.size();
+    if (std::find(super_node_addresses.begin(), super_node_addresses.end(), parsed_contribution.address) == super_node_addresses.end())
       total_num_of_addr++;
 
     if (total_num_of_addr > MAX_NUMBER_OF_CONTRIBUTORS)
@@ -755,40 +755,40 @@ namespace service_nodes
 
     // don't actually process this contribution now, do it when we fall through later.
 
-    key = service_node_key;
+    key = super_node_key;
 
-    info.operator_address = service_node_addresses[0];
+    info.operator_address = super_node_addresses[0];
     info.portions_for_operator = portions_for_operator;
     info.registration_height = block_height;
     info.last_reward_block_height = block_height;
     info.last_reward_transaction_index = index;
     info.total_contributed = 0;
     info.total_reserved = 0;
-    info.version = get_min_service_node_info_version_for_hf(hf_version);
+    info.version = get_min_super_node_info_version_for_hf(hf_version);
 
-    if (info.version >= service_node_info::version_1_swarms)
+    if (info.version >= super_node_info::version_1_swarms)
       info.swarm_id = QUEUE_SWARM_ID; /// new nodes go into a "queue swarm"
 
     info.contributors.clear();
 
-    for (size_t i = 0; i < service_node_addresses.size(); i++)
+    for (size_t i = 0; i < super_node_addresses.size(); i++)
     {
       // Check for duplicates
-      auto iter = std::find(service_node_addresses.begin(), service_node_addresses.begin() + i, service_node_addresses[i]);
-      if (iter != service_node_addresses.begin() + i)
+      auto iter = std::find(super_node_addresses.begin(), super_node_addresses.begin() + i, super_node_addresses[i]);
+      if (iter != super_node_addresses.begin() + i)
       {
-        LOG_PRINT_L1("Register TX: There was a duplicate participant for service node on height: " << block_height << " for tx: " << cryptonote::get_transaction_hash(tx));
+        LOG_PRINT_L1("Register TX: There was a duplicate participant for super node on height: " << block_height << " for tx: " << cryptonote::get_transaction_hash(tx));
         return false;
       }
 
       uint64_t hi, lo, resulthi, resultlo;
-      lo = mul128(info.staking_requirement, service_node_portions[i], &hi);
+      lo = mul128(info.staking_requirement, super_node_portions[i], &hi);
       div128_64(hi, lo, STAKING_PORTIONS, &resulthi, &resultlo);
 
-      service_node_info::contributor_t contributor = {};
-      contributor.version                          = get_min_service_node_info_version_for_hf(hf_version);
+      super_node_info::contributor_t contributor = {};
+      contributor.version                          = get_min_super_node_info_version_for_hf(hf_version);
       contributor.reserved                         = resultlo;
-      contributor.address                          = service_node_addresses[i];
+      contributor.address                          = super_node_addresses[i];
       info.contributors.push_back(contributor);
       info.total_reserved += resultlo;
     }
@@ -796,10 +796,10 @@ namespace service_nodes
     return true;
   }
 
-  bool service_node_list::process_registration_tx(const cryptonote::transaction& tx, uint64_t block_timestamp, uint64_t block_height, uint32_t index)
+  bool super_node_list::process_registration_tx(const cryptonote::transaction& tx, uint64_t block_timestamp, uint64_t block_height, uint32_t index)
   {
     crypto::public_key key;
-    service_node_info info = {};
+    super_node_info info = {};
     if (!is_registration_tx(tx, block_timestamp, block_height, index, key, info))
       return false;
 
@@ -807,24 +807,24 @@ namespace service_nodes
     if (hard_fork_version >= cryptonote::network_version_11_infinite_staking)
     {
       // NOTE(sevabit): Grace period is not used anymore with infinite staking. So, if someone somehow reregisters, we just ignore it
-      const auto iter = m_service_nodes_infos.find(key);
-      if (iter != m_service_nodes_infos.end())
+      const auto iter = m_super_nodes_infos.find(key);
+      if (iter != m_super_nodes_infos.end())
         return false;
 
-      if (m_service_node_pubkey && *m_service_node_pubkey == key) MGINFO_GREEN("Service node registered (yours): " << key << " on height: " << block_height);
-      else                                                        LOG_PRINT_L1("New service node registered: "     << key << " on height: " << block_height);
+      if (m_super_node_pubkey && *m_super_node_pubkey == key) MGINFO_GREEN("Super node registered (yours): " << key << " on height: " << block_height);
+      else                                                        LOG_PRINT_L1("New super node registered: "     << key << " on height: " << block_height);
     }
     else
     {
       // NOTE: A node doesn't expire until registration_height + lock blocks excess now which acts as the grace period
       // So it is possible to find the node still in our list.
       bool registered_during_grace_period = false;
-      const auto iter = m_service_nodes_infos.find(key);
-      if (iter != m_service_nodes_infos.end())
+      const auto iter = m_super_nodes_infos.find(key);
+      if (iter != m_super_nodes_infos.end())
       {
         if (hard_fork_version >= cryptonote::network_version_10_bulletproofs)
         {
-          service_node_info const &old_info = iter->second;
+          super_node_info const &old_info = iter->second;
           uint64_t expiry_height = old_info.registration_height + staking_num_lock_blocks(m_blockchain.nettype());
           if (block_height < expiry_height)
             return false;
@@ -840,58 +840,58 @@ namespace service_nodes
         }
       }
 
-      if (m_service_node_pubkey && *m_service_node_pubkey == key)
+      if (m_super_node_pubkey && *m_super_node_pubkey == key)
       {
         if (registered_during_grace_period)
         {
-          MGINFO_GREEN("Service node re-registered (yours): " << key << " at block height: " << block_height);
+          MGINFO_GREEN("Super node re-registered (yours): " << key << " at block height: " << block_height);
         }
         else
         {
-          MGINFO_GREEN("Service node registered (yours): " << key << " at block height: " << block_height);
+          MGINFO_GREEN("Super node registered (yours): " << key << " at block height: " << block_height);
         }
       }
       else
       {
-        LOG_PRINT_L1("New service node registered: " << key << " at block height: " << block_height);
+        LOG_PRINT_L1("New super node registered: " << key << " at block height: " << block_height);
       }
     }
 
     m_rollback_events.push_back(std::unique_ptr<rollback_event>(new rollback_new(block_height, key)));
-    m_service_nodes_infos[key] = info;
+    m_super_nodes_infos[key] = info;
     return true;
   }
 
-  void service_node_list::process_contribution_tx(const cryptonote::transaction& tx, uint64_t block_height, uint32_t index)
+  void super_node_list::process_contribution_tx(const cryptonote::transaction& tx, uint64_t block_height, uint32_t index)
   {
     crypto::public_key pubkey;
 
-    if (!cryptonote::get_service_node_pubkey_from_tx_extra(tx.extra, pubkey))
+    if (!cryptonote::get_super_node_pubkey_from_tx_extra(tx.extra, pubkey))
       return; // Is not a contribution TX don't need to check it.
 
     parsed_tx_contribution parsed_contribution = {};
     const int hf_version = m_blockchain.get_hard_fork_version(block_height);
     if (!get_contribution(m_blockchain.nettype(), hf_version, tx, block_height, parsed_contribution))
     {
-      LOG_PRINT_L1("Contribution TX: Could not decode contribution for service node: " << pubkey << " on height: " << block_height << " for tx: " << cryptonote::get_transaction_hash(tx));
+      LOG_PRINT_L1("Contribution TX: Could not decode contribution for super node: " << pubkey << " on height: " << block_height << " for tx: " << cryptonote::get_transaction_hash(tx));
       return;
     }
 
-    /// Service node must be registered
-    auto iter = m_service_nodes_infos.find(pubkey);
-    if (iter == m_service_nodes_infos.end())
+    /// Super node must be registered
+    auto iter = m_super_nodes_infos.find(pubkey);
+    if (iter == m_super_nodes_infos.end())
     {
-      LOG_PRINT_L1("Contribution TX: Contribution received for service node: " << pubkey <<
-                   ", but could not be found in the service node list on height: " << block_height <<
+      LOG_PRINT_L1("Contribution TX: Contribution received for super node: " << pubkey <<
+                   ", but could not be found in the super node list on height: " << block_height <<
                    " for tx: " << cryptonote::get_transaction_hash(tx )<< "\n"
-                   "This could mean that the service node was deregistered before the contribution was processed.");
+                   "This could mean that the super node was deregistered before the contribution was processed.");
       return;
     }
 
-    service_node_info& info = iter->second;
+    super_node_info& info = iter->second;
     if (info.is_fully_funded())
     {
-      LOG_PRINT_L1("Contribution TX: Service node: " << pubkey <<
+      LOG_PRINT_L1("Contribution TX: Super node: " << pubkey <<
                    " is already fully funded, but contribution received on height: "  << block_height <<
                    " for tx: " << cryptonote::get_transaction_hash(tx));
       return;
@@ -906,7 +906,7 @@ namespace service_nodes
     auto& contributors = info.contributors;
 
     auto contrib_iter = std::find_if(contributors.begin(), contributors.end(),
-        [&parsed_contribution](const service_node_info::contributor_t& contributor) { return contributor.address == parsed_contribution.address; });
+        [&parsed_contribution](const super_node_info::contributor_t& contributor) { return contributor.address == parsed_contribution.address; });
     const bool new_contributor = (contrib_iter == contributors.end());
 
     if (new_contributor)
@@ -914,7 +914,7 @@ namespace service_nodes
       if (contributors.size() >= MAX_NUMBER_OF_CONTRIBUTORS)
       {
         LOG_PRINT_L1("Contribution TX: Node is full with max contributors: " << MAX_NUMBER_OF_CONTRIBUTORS <<
-                     " for service node: " << pubkey <<
+                     " for super node: " << pubkey <<
                      " on height: "  << block_height <<
                      " for tx: " << cryptonote::get_transaction_hash(tx));
         return;
@@ -927,7 +927,7 @@ namespace service_nodes
       {
         LOG_PRINT_L1("Contribution TX: Amount " << parsed_contribution.transferred <<
                      " did not meet min " << min_contribution <<
-                     " for service node: " << pubkey <<
+                     " for super node: " << pubkey <<
                      " on height: "  << block_height <<
                      " for tx: " << cryptonote::get_transaction_hash(tx));
         return;
@@ -941,14 +941,14 @@ namespace service_nodes
     m_rollback_events.push_back(std::unique_ptr<rollback_event>(new rollback_change(block_height, pubkey, info)));
     if (new_contributor)
     {
-      service_node_info::contributor_t new_contributor = {};
-      new_contributor.version                          = get_min_service_node_info_version_for_hf(hf_version);
+      super_node_info::contributor_t new_contributor = {};
+      new_contributor.version                          = get_min_super_node_info_version_for_hf(hf_version);
       new_contributor.address                          = parsed_contribution.address;
       info.contributors.push_back(new_contributor);
       contrib_iter = --contributors.end();
     }
 
-    service_node_info::contributor_t& contributor = *contrib_iter;
+    super_node_info::contributor_t& contributor = *contrib_iter;
 
     // In this action, we cannot
     // increase total_reserved so much that it is >= staking_requirement
@@ -968,12 +968,12 @@ namespace service_nodes
     info.last_reward_block_height = block_height;
     info.last_reward_transaction_index = index;
 
-    const size_t max_contributions_per_node = service_nodes::MAX_KEY_IMAGES_PER_CONTRIBUTOR * MAX_NUMBER_OF_CONTRIBUTORS;
+    const size_t max_contributions_per_node = super_nodes::MAX_KEY_IMAGES_PER_CONTRIBUTOR * MAX_NUMBER_OF_CONTRIBUTORS;
     if (hf_version >= cryptonote::network_version_11_infinite_staking)
     {
-      std::vector<service_node_info::contribution_t> &locked_contributions = contributor.locked_contributions;
+      std::vector<super_node_info::contribution_t> &locked_contributions = contributor.locked_contributions;
 
-      for (const service_node_info::contribution_t &contribution : parsed_contribution.locked_contributions)
+      for (const super_node_info::contribution_t &contribution : parsed_contribution.locked_contributions)
       {
         if (info.total_num_locked_contributions() < max_contributions_per_node)
           contributor.locked_contributions.push_back(contribution);
@@ -988,10 +988,10 @@ namespace service_nodes
       }
     }
 
-    LOG_PRINT_L1("Contribution of " << parsed_contribution.transferred << " received for service node " << pubkey);
+    LOG_PRINT_L1("Contribution of " << parsed_contribution.transferred << " received for super node " << pubkey);
   }
 
-  void service_node_list::block_added(const cryptonote::block& block, const std::vector<cryptonote::transaction>& txs)
+  void super_node_list::block_added(const cryptonote::block& block, const std::vector<cryptonote::transaction>& txs)
   {
     std::lock_guard<boost::recursive_mutex> lock(m_sn_mutex);
     block_added_generic(block, txs);
@@ -1000,7 +1000,7 @@ namespace service_nodes
 
 
   template<typename T>
-  void service_node_list::block_added_generic(const cryptonote::block& block, const T& txs)
+  void super_node_list::block_added_generic(const cryptonote::block& block, const T& txs)
   {
     uint64_t block_height = cryptonote::get_block_height(block);
     int hard_fork_version = m_blockchain.get_hard_fork_version(block_height);
@@ -1045,22 +1045,22 @@ namespace service_nodes
     size_t expired_count = 0;
     for (const crypto::public_key& pubkey : update_and_get_expired_nodes(txs, block_height))
     {
-      auto i = m_service_nodes_infos.find(pubkey);
-      if (i != m_service_nodes_infos.end())
+      auto i = m_super_nodes_infos.find(pubkey);
+      if (i != m_super_nodes_infos.end())
       {
-        if (m_service_node_pubkey && *m_service_node_pubkey == pubkey)
+        if (m_super_node_pubkey && *m_super_node_pubkey == pubkey)
         {
-          MGINFO_GREEN("Service node expired (yours): " << pubkey << " at block height: " << block_height);
+          MGINFO_GREEN("Super node expired (yours): " << pubkey << " at block height: " << block_height);
         }
         else
         {
-          LOG_PRINT_L1("Service node expired: " << pubkey << " at block height: " << block_height);
+          LOG_PRINT_L1("Super node expired: " << pubkey << " at block height: " << block_height);
         }
 
         m_rollback_events.push_back(std::unique_ptr<rollback_event>(new rollback_change(block_height, pubkey, i->second)));
 
         expired_count++;
-        m_service_nodes_infos.erase(i);
+        m_super_nodes_infos.erase(i);
       }
     }
 
@@ -1068,17 +1068,17 @@ namespace service_nodes
     // Advance the list to the next candidate for a reward
     //
     {
-      crypto::public_key winner_pubkey = cryptonote::get_service_node_winner_from_tx_extra(block.miner_tx.extra);
-      if (m_service_nodes_infos.count(winner_pubkey) == 1)
+      crypto::public_key winner_pubkey = cryptonote::get_super_node_winner_from_tx_extra(block.miner_tx.extra);
+      if (m_super_nodes_infos.count(winner_pubkey) == 1)
       {
         m_rollback_events.push_back(
           std::unique_ptr<rollback_event>(
-            new rollback_change(block_height, winner_pubkey, m_service_nodes_infos[winner_pubkey])
+            new rollback_change(block_height, winner_pubkey, m_super_nodes_infos[winner_pubkey])
           )
         );
         // set the winner as though it was re-registering at transaction index=UINT32_MAX for this block
-        m_service_nodes_infos[winner_pubkey].last_reward_block_height = block_height;
-        m_service_nodes_infos[winner_pubkey].last_reward_transaction_index = UINT32_MAX;
+        m_super_nodes_infos[winner_pubkey].last_reward_block_height = block_height;
+        m_super_nodes_infos[winner_pubkey].last_reward_transaction_index = UINT32_MAX;
       }
     }
 
@@ -1106,14 +1106,14 @@ namespace service_nodes
       else if (tx_type == cryptonote::transaction::type_key_image_unlock)
       {
         crypto::public_key snode_key;
-        if (!cryptonote::get_service_node_pubkey_from_tx_extra(tx.extra, snode_key))
+        if (!cryptonote::get_super_node_pubkey_from_tx_extra(tx.extra, snode_key))
           continue;
 
-        auto it = m_service_nodes_infos.find(snode_key);
-        if (it == m_service_nodes_infos.end())
+        auto it = m_super_nodes_infos.find(snode_key);
+        if (it == m_super_nodes_infos.end())
           continue;
 
-        service_node_info &node_info = (*it).second;
+        super_node_info &node_info = (*it).second;
         if (node_info.requested_unlock_height != KEY_IMAGE_AWAITING_UNLOCK_HEIGHT)
         {
           LOG_PRINT_L1("Unlock TX: Node already requested an unlock at height: " << node_info.requested_unlock_height << " rejected on height: " << block_height << " for tx: " << get_transaction_hash(tx));
@@ -1142,7 +1142,7 @@ namespace service_nodes
               continue;
 
             // NOTE(sevabit): This should be checked in blockchain check_tx_inputs already
-            crypto::hash const hash = service_nodes::generate_request_stake_unlock_hash(unlock.nonce);
+            crypto::hash const hash = super_nodes::generate_request_stake_unlock_hash(unlock.nonce);
             if (!crypto::check_signature(hash, locked_contribution->key_image_pub_key, unlock.signature))
             {
               LOG_PRINT_L1("Unlock TX: Couldn't verify key image unlock in the tx_extra, rejected on height: " << block_height << " for tx: " << get_transaction_hash(tx));
@@ -1172,7 +1172,7 @@ namespace service_nodes
     }
   }
 
-  void service_node_list::blockchain_detached(uint64_t height)
+  void super_node_list::blockchain_detached(uint64_t height)
   {
     std::lock_guard<boost::recursive_mutex> lock(m_sn_mutex);
     while (!m_rollback_events.empty() && m_rollback_events.back()->m_block_height >= height)
@@ -1184,7 +1184,7 @@ namespace service_nodes
         case rollback_event::change_type:
         {
           auto *rollback = reinterpret_cast<rollback_change *>(event);
-          m_service_nodes_infos[rollback->m_key] = rollback->m_info;
+          m_super_nodes_infos[rollback->m_key] = rollback->m_info;
         }
         break;
 
@@ -1192,15 +1192,15 @@ namespace service_nodes
         {
           auto *rollback = reinterpret_cast<rollback_new *>(event);
 
-          auto iter = m_service_nodes_infos.find(rollback->m_key);
-          if (iter == m_service_nodes_infos.end())
+          auto iter = m_super_nodes_infos.find(rollback->m_key);
+          if (iter == m_super_nodes_infos.end())
           {
-            MERROR("Could not find service node pubkey in rollback new");
+            MERROR("Could not find super node pubkey in rollback new");
             rollback_applied = false;
             break;
           }
 
-          m_service_nodes_infos.erase(iter);
+          m_super_nodes_infos.erase(iter);
         }
         break;
 
@@ -1256,14 +1256,14 @@ namespace service_nodes
     store();
   }
 
-  std::vector<crypto::public_key> service_node_list::update_and_get_expired_nodes(const std::vector<cryptonote::transaction> &txs, uint64_t block_height)
+  std::vector<crypto::public_key> super_node_list::update_and_get_expired_nodes(const std::vector<cryptonote::transaction> &txs, uint64_t block_height)
   {
     std::vector<crypto::public_key> expired_nodes;
     uint64_t const lock_blocks = staking_num_lock_blocks(m_blockchain.nettype());
 
     // TODO(sevabit): This should really use the registration height instead of getting the block and expiring nodes.
     // But there's something subtly off when using registration height causing syncing problems.
-    if (m_blockchain.get_hard_fork_version(block_height) == cryptonote::network_version_9_service_nodes)
+    if (m_blockchain.get_hard_fork_version(block_height) == cryptonote::network_version_9_super_nodes)
     {
       if (block_height < lock_blocks)
         return expired_nodes;
@@ -1289,7 +1289,7 @@ namespace service_nodes
       for (const cryptonote::transaction& tx : txs)
       {
         crypto::public_key key;
-        service_node_info info = {};
+        super_node_info info = {};
         if (is_registration_tx(tx, block.timestamp, expired_nodes_block_height, index, key, info))
         {
           expired_nodes.push_back(key);
@@ -1299,10 +1299,10 @@ namespace service_nodes
     }
     else
     {
-      for (auto it = m_service_nodes_infos.begin(); it != m_service_nodes_infos.end(); it++)
+      for (auto it = m_super_nodes_infos.begin(); it != m_super_nodes_infos.end(); it++)
       {
         crypto::public_key const &snode_key = it->first;
-        service_node_info &info             = it->second;
+        super_node_info &info             = it->second;
         int const hf_version                = m_blockchain.get_hard_fork_version(info.registration_height);
 
         if (hf_version >= cryptonote::network_version_11_infinite_staking)
@@ -1326,7 +1326,7 @@ namespace service_nodes
     return expired_nodes;
   }
 
-  std::vector<std::pair<cryptonote::account_public_address, uint64_t>> service_node_list::get_winner_addresses_and_portions() const
+  std::vector<std::pair<cryptonote::account_public_address, uint64_t>> super_node_list::get_winner_addresses_and_portions() const
   {
     std::lock_guard<boost::recursive_mutex> lock(m_sn_mutex);
     crypto::public_key key = select_winner();
@@ -1335,7 +1335,7 @@ namespace service_nodes
 
     std::vector<std::pair<cryptonote::account_public_address, uint64_t>> winners;
 
-    const service_node_info& info = m_service_nodes_infos.at(key);
+    const super_node_info& info = m_super_nodes_infos.at(key);
 
     const uint64_t remaining_portions = STAKING_PORTIONS - info.portions_for_operator;
 
@@ -1354,12 +1354,12 @@ namespace service_nodes
     return winners;
   }
 
-  crypto::public_key service_node_list::select_winner() const
+  crypto::public_key super_node_list::select_winner() const
   {
     std::lock_guard<boost::recursive_mutex> lock(m_sn_mutex);
     auto oldest_waiting = std::pair<uint64_t, uint32_t>(std::numeric_limits<uint64_t>::max(), std::numeric_limits<uint32_t>::max());
     crypto::public_key key = crypto::null_pkey;
-    for (const auto& info : m_service_nodes_infos)
+    for (const auto& info : m_super_nodes_infos)
       if (info.second.is_fully_funded())
       {
         auto waiting_since = std::make_pair(info.second.last_reward_block_height, info.second.last_reward_transaction_index);
@@ -1372,22 +1372,22 @@ namespace service_nodes
     return key;
   }
 
-  bool service_node_list::validate_miner_tx(const crypto::hash& prev_id, const cryptonote::transaction& miner_tx, uint64_t height, int hard_fork_version, cryptonote::block_reward_parts const &reward_parts) const
+  bool super_node_list::validate_miner_tx(const crypto::hash& prev_id, const cryptonote::transaction& miner_tx, uint64_t height, int hard_fork_version, cryptonote::block_reward_parts const &reward_parts) const
   {
     std::lock_guard<boost::recursive_mutex> lock(m_sn_mutex);
     if (hard_fork_version < 9)
       return true;
 
-    // NOTE(sevabit): Service node reward distribution is calculated from the
+    // NOTE(sevabit): Super node reward distribution is calculated from the
     // original amount, i.e. 50% of the original base reward goes to service
     // nodes not 50% of the reward after removing the governance component (the
     // adjusted base reward post hardfork 10).
     uint64_t base_reward = reward_parts.original_base_reward;
-    uint64_t total_service_node_reward = cryptonote::service_node_reward_formula(base_reward, hard_fork_version);
+    uint64_t total_super_node_reward = cryptonote::super_node_reward_formula(base_reward, hard_fork_version);
 
     crypto::public_key winner = select_winner();
 
-    crypto::public_key check_winner_pubkey = cryptonote::get_service_node_winner_from_tx_extra(miner_tx.extra);
+    crypto::public_key check_winner_pubkey = cryptonote::get_super_node_winner_from_tx_extra(miner_tx.extra);
     if (check_winner_pubkey != winner)
       return false;
 
@@ -1399,17 +1399,17 @@ namespace service_nodes
     for (size_t i = 0; i < addresses_and_portions.size(); i++)
     {
       size_t vout_index = i + 1;
-      uint64_t reward = cryptonote::get_portion_of_reward(addresses_and_portions[i].second, total_service_node_reward);
+      uint64_t reward = cryptonote::get_portion_of_reward(addresses_and_portions[i].second, total_super_node_reward);
 
       if (miner_tx.vout[vout_index].amount != reward)
       {
-        MERROR("Service node reward amount incorrect. Should be " << cryptonote::print_money(reward) << ", is: " << cryptonote::print_money(miner_tx.vout[vout_index].amount));
+        MERROR("Super node reward amount incorrect. Should be " << cryptonote::print_money(reward) << ", is: " << cryptonote::print_money(miner_tx.vout[vout_index].amount));
         return false;
       }
 
       if (miner_tx.vout[vout_index].target.type() != typeid(cryptonote::txout_to_key))
       {
-        MERROR("Service node output target type should be txout_to_key");
+        MERROR("Super node output target type should be txout_to_key");
         return false;
       }
 
@@ -1424,7 +1424,7 @@ namespace service_nodes
 
       if (boost::get<cryptonote::txout_to_key>(miner_tx.vout[vout_index].target).key != out_eph_public_key)
       {
-        MERROR("Invalid service node reward output");
+        MERROR("Invalid super node reward output");
         return false;
       }
     }
@@ -1445,7 +1445,7 @@ namespace service_nodes
     }
   }
 
-  void service_node_list::store_quorum_state_from_rewards_list(uint64_t height)
+  void super_node_list::store_quorum_state_from_rewards_list(uint64_t height)
   {
     const crypto::hash block_hash = m_blockchain.get_block_id_by_height(height);
     if (block_hash == crypto::null_hash)
@@ -1454,7 +1454,7 @@ namespace service_nodes
       return;
     }
 
-    std::vector<crypto::public_key> full_node_list = get_service_nodes_pubkeys();
+    std::vector<crypto::public_key> full_node_list = get_super_nodes_pubkeys();
     std::vector<size_t>                              pub_keys_indexes(full_node_list.size());
     {
       size_t index = 0;
@@ -1506,33 +1506,33 @@ namespace service_nodes
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  service_node_list::rollback_event::rollback_event(uint64_t block_height, rollback_type type) : m_block_height(block_height), type(type)
+  super_node_list::rollback_event::rollback_event(uint64_t block_height, rollback_type type) : m_block_height(block_height), type(type)
   {
   }
 
-  service_node_list::rollback_change::rollback_change(uint64_t block_height, const crypto::public_key& key, const service_node_info& info)
-    : service_node_list::rollback_event(block_height, change_type), m_key(key), m_info(info)
+  super_node_list::rollback_change::rollback_change(uint64_t block_height, const crypto::public_key& key, const super_node_info& info)
+    : super_node_list::rollback_event(block_height, change_type), m_key(key), m_info(info)
   {
   }
 
-  service_node_list::rollback_new::rollback_new(uint64_t block_height, const crypto::public_key& key)
-    : service_node_list::rollback_event(block_height, new_type), m_key(key)
+  super_node_list::rollback_new::rollback_new(uint64_t block_height, const crypto::public_key& key)
+    : super_node_list::rollback_event(block_height, new_type), m_key(key)
   {
   }
 
-  service_node_list::prevent_rollback::prevent_rollback(uint64_t block_height) : service_node_list::rollback_event(block_height, prevent_type) { }
+  super_node_list::prevent_rollback::prevent_rollback(uint64_t block_height) : super_node_list::rollback_event(block_height, prevent_type) { }
 
-  service_node_list::rollback_key_image_blacklist::rollback_key_image_blacklist(uint64_t block_height, key_image_blacklist_entry const &entry, bool is_adding_to_blacklist)
-    : service_node_list::rollback_event(block_height, key_image_blacklist_type), m_entry(entry), m_was_adding_to_blacklist(is_adding_to_blacklist)
+  super_node_list::rollback_key_image_blacklist::rollback_key_image_blacklist(uint64_t block_height, key_image_blacklist_entry const &entry, bool is_adding_to_blacklist)
+    : super_node_list::rollback_event(block_height, key_image_blacklist_type), m_entry(entry), m_was_adding_to_blacklist(is_adding_to_blacklist)
   {
   }
 
-  bool service_node_list::store()
+  bool super_node_list::store()
   {
-    if (m_blockchain.get_current_hard_fork_version() < cryptonote::network_version_9_service_nodes)
+    if (m_blockchain.get_current_hard_fork_version() < cryptonote::network_version_9_super_nodes)
       return true;
 
-    CHECK_AND_ASSERT_MES(m_db != nullptr, false, "Failed to store service node info, m_db == nullptr");
+    CHECK_AND_ASSERT_MES(m_db != nullptr, false, "Failed to store super node info, m_db == nullptr");
     data_members_for_serialization data_to_store;
     {
       std::lock_guard<boost::recursive_mutex> lock(m_sn_mutex);
@@ -1545,8 +1545,8 @@ namespace service_nodes
         data_to_store.quorum_states.push_back(quorum);
       }
 
-      service_node_pubkey_info info;
-      for (const auto& kv_pair : m_service_nodes_infos)
+      super_node_pubkey_info info;
+      for (const auto& kv_pair : m_super_nodes_infos)
       {
         info.pubkey = kv_pair.first;
         info.info   = kv_pair.second;
@@ -1562,7 +1562,7 @@ namespace service_nodes
           case rollback_event::prevent_type:             data_to_store.events.push_back(*reinterpret_cast<prevent_rollback *>(event_ptr.get())); break;
           case rollback_event::key_image_blacklist_type: data_to_store.events.push_back(*reinterpret_cast<rollback_key_image_blacklist *>(event_ptr.get())); break;
           default:
-            MERROR("On storing service node data, unknown rollback event type encountered");
+            MERROR("On storing super node data, unknown rollback event type encountered");
             return false;
         }
       }
@@ -1572,48 +1572,48 @@ namespace service_nodes
 
     data_to_store.height  = m_height;
     int hf_version        = m_blockchain.get_hard_fork_version(m_height - 1);
-    data_to_store.version = get_min_service_node_info_version_for_hf(hf_version);
+    data_to_store.version = get_min_super_node_info_version_for_hf(hf_version);
 
     std::stringstream ss;
     binary_archive<true> ba(ss);
 
     bool r = ::serialization::serialize(ba, data_to_store);
-    CHECK_AND_ASSERT_MES(r, false, "Failed to store service node info: failed to serialize data");
+    CHECK_AND_ASSERT_MES(r, false, "Failed to store super node info: failed to serialize data");
 
     std::string blob = ss.str();
     m_db->block_txn_start(false/*readonly*/);
-    m_db->set_service_node_data(blob);
+    m_db->set_super_node_data(blob);
     m_db->block_txn_stop();
 
     return true;
   }
 
-  void service_node_list::get_all_service_nodes_public_keys(std::vector<crypto::public_key>& keys, bool fully_funded_nodes_only) const
+  void super_node_list::get_all_super_nodes_public_keys(std::vector<crypto::public_key>& keys, bool fully_funded_nodes_only) const
   {
     keys.clear();
-    keys.resize(m_service_nodes_infos.size());
+    keys.resize(m_super_nodes_infos.size());
 
     size_t i = 0;
     if (fully_funded_nodes_only)
     {
-      for (const auto &it : m_service_nodes_infos)
+      for (const auto &it : m_super_nodes_infos)
       {
-        service_node_info const &info = it.second;
+        super_node_info const &info = it.second;
         if (info.is_fully_funded())
           keys[i++] = it.first;
       }
     }
     else
     {
-      for (const auto &it : m_service_nodes_infos)
+      for (const auto &it : m_super_nodes_infos)
         keys[i++] = it.first;
     }
   }
 
 
-  bool service_node_list::load()
+  bool super_node_list::load()
   {
-    LOG_PRINT_L1("service_node_list::load()");
+    LOG_PRINT_L1("super_node_list::load()");
     clear(false);
     if (!m_db)
     {
@@ -1625,7 +1625,7 @@ namespace service_nodes
     std::string blob;
 
     m_db->block_txn_start(true/*readonly*/);
-    if (!m_db->get_service_node_data(blob))
+    if (!m_db->get_super_node_data(blob))
     {
       m_db->block_txn_stop();
       return false;
@@ -1635,7 +1635,7 @@ namespace service_nodes
     ss << blob;
     binary_archive<false> ba(ss);
     bool r = ::serialization::serialize(ba, data_in);
-    CHECK_AND_ASSERT_MES(r, false, "Failed to parse service node data from blob");
+    CHECK_AND_ASSERT_MES(r, false, "Failed to parse super node data from blob");
 
     m_height = data_in.height;
     m_key_image_blacklist = data_in.key_image_blacklist;
@@ -1647,7 +1647,7 @@ namespace service_nodes
 
     for (const auto& info : data_in.infos)
     {
-      m_service_nodes_infos[info.pubkey] = info.info;
+      m_super_nodes_infos[info.pubkey] = info.info;
     }
 
     for (const auto& event : data_in.events)
@@ -1682,27 +1682,27 @@ namespace service_nodes
       }
       else
       {
-        MERROR("Unhandled rollback event type in restoring data to service node list.");
+        MERROR("Unhandled rollback event type in restoring data to super node list.");
         return false;
       }
     }
 
-    MGINFO("Service node data loaded successfully, m_height: " << m_height);
-    MGINFO(m_service_nodes_infos.size() << " nodes and " << m_rollback_events.size() << " rollback events loaded.");
+    MGINFO("Super node data loaded successfully, m_height: " << m_height);
+    MGINFO(m_super_nodes_infos.size() << " nodes and " << m_rollback_events.size() << " rollback events loaded.");
 
-    LOG_PRINT_L1("service_node_list::load() returning success");
+    LOG_PRINT_L1("super_node_list::load() returning success");
     return true;
   }
 
-  void service_node_list::clear(bool delete_db_entry)
+  void super_node_list::clear(bool delete_db_entry)
   {
-    m_service_nodes_infos.clear();
+    m_super_nodes_infos.clear();
     m_rollback_events.clear();
 
     if (m_db && delete_db_entry)
     {
       m_db->block_txn_start(false/*readonly*/);
-      m_db->clear_service_node_data();
+      m_db->clear_super_node_data();
       m_db->block_txn_stop();
     }
 
@@ -1717,10 +1717,10 @@ namespace service_nodes
     m_height = hardfork_9_from_height;
   }
 
-  size_t service_node_info::total_num_locked_contributions() const
+  size_t super_node_info::total_num_locked_contributions() const
   {
     size_t result = 0;
-    for (service_node_info::contributor_t const &contributor : this->contributors)
+    for (super_node_info::contributor_t const &contributor : this->contributors)
       result += contributor.locked_contributions.size();
     return result;
   }
@@ -1802,7 +1802,7 @@ namespace service_nodes
 
         result.addresses.push_back(info.address);
         result.portions.push_back(num_portions);
-        uint64_t sevabit_amount = service_nodes::portions_to_amount(num_portions, staking_requirement);
+        uint64_t sevabit_amount = super_nodes::portions_to_amount(num_portions, staking_requirement);
         total_reserved      += sevabit_amount;
       }
       catch (const std::exception &e)
@@ -1825,8 +1825,8 @@ namespace service_nodes
       int hf_version,
       uint64_t staking_requirement,
       const std::vector<std::string>& args,
-      const crypto::public_key& service_node_pubkey,
-      const crypto::secret_key &service_node_key,
+      const crypto::public_key& super_node_pubkey,
+      const crypto::secret_key &super_node_key,
       std::string &cmd,
       bool make_friendly,
       boost::optional<std::string&> err_msg)
@@ -1850,7 +1850,7 @@ namespace service_nodes
     }
 
     crypto::signature signature;
-    crypto::generate_signature(hash, service_node_pubkey, service_node_key, signature);
+    crypto::generate_signature(hash, super_node_pubkey, super_node_key, signature);
 
     std::stringstream stream;
     if (make_friendly)
@@ -1858,14 +1858,14 @@ namespace service_nodes
       stream << tr("Run this command in the wallet that will fund this registration:\n\n");
     }
 
-    stream << "register_service_node";
+    stream << "register_super_node";
     for (size_t i = 0; i < args.size(); ++i)
     {
       stream << " " << args[i];
     }
 
     stream << " " << exp_timestamp << " ";
-    stream << epee::string_tools::pod_to_hex(service_node_pubkey) << " ";
+    stream << epee::string_tools::pod_to_hex(super_node_pubkey) << " ";
     stream << epee::string_tools::pod_to_hex(signature);
 
     if (make_friendly)

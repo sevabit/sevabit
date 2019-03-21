@@ -90,7 +90,7 @@ public:
   void stop() {}
 
   // TODO(sevabit): Write tests
-  bool add_deregister_vote(const service_nodes::deregister_vote& vote, cryptonote::vote_verification_context &vvc) { return true; }
+  bool add_deregister_vote(const super_nodes::deregister_vote& vote, cryptonote::vote_verification_context &vvc) { return true; }
 };
 
 typedef nodetool::node_server<cryptonote::t_cryptonote_protocol_handler<test_core>> Server;

@@ -41,7 +41,7 @@
 #include "blockchain.h"
 #include "blockchain_db/blockchain_db.h"
 #include "cryptonote_basic/cryptonote_boost_serialization.h"
-#include "cryptonote_core/service_node_deregister.h"
+#include "cryptonote_core/super_node_deregister.h"
 #include "cryptonote_config.h"
 #include "cryptonote_basic/miner.h"
 #include "misc_language.h"
@@ -56,8 +56,8 @@
 #include "ringct/rctSigs.h"
 #include "common/perf_timer.h"
 #include "common/notify.h"
-#include "service_node_deregister.h"
-#include "service_node_list.h"
+#include "super_node_deregister.h"
+#include "super_node_list.h"
 #include "common/varint.h"
 #include "common/pruning.h"
 
@@ -100,7 +100,7 @@ static const hard_fork_record mainnet_hard_forks[] =
 {
   { network_version_7,               1, 0, 1543540000 },
   { network_version_8,               2, 0, 1543540001 },
-  { network_version_9_service_nodes, 3, 0, 1543540002 },
+  { network_version_9_super_nodes, 3, 0, 1543540002 },
   { network_version_10_bulletproofs, 4, 0, 1543540003 }, // 2018-12-13 23:30UTC
   { network_version_11_infinite_staking, 66660, 0, 1554010989  }, // Sunday, March 31, 2019 5:43:09 AM GMT
 };
@@ -109,7 +109,7 @@ static const hard_fork_record testnet_hard_forks[] =
 {
   { network_version_7,               1,     0, 1533631121 },
   { network_version_8,               2,     0, 1533631122 },
-  { network_version_9_service_nodes, 3,     0, 1533631123 },
+  { network_version_9_super_nodes, 3,     0, 1533631123 },
   { network_version_10_bulletproofs, 4,     0, 1542681077 }, // Tuesday March 19 2019  10:57:09 GMT 
   { network_version_11_infinite_staking, 66000, 0, 1552993018  },
 };
@@ -118,20 +118,20 @@ static const hard_fork_record stagenet_hard_forks[] =
 {
   { network_version_7,               1,     0, 1533631121 },
   { network_version_8,               2,     0, 1533631122 },
-  { network_version_9_service_nodes, 3,     0, 1533631123 },
+  { network_version_9_super_nodes, 3,     0, 1533631123 },
   { network_version_10_bulletproofs, 4,     0, 1542681077 }, // 2018-11-20 13:30 AEDT
   { network_version_11_infinite_staking, 66000, 0, 1552993018  }, // Tuesday March 19 2019  10:57:09 GMT 
 };
 
 //------------------------------------------------------------------
-Blockchain::Blockchain(tx_memory_pool& tx_pool, service_nodes::service_node_list& service_node_list, service_nodes::deregister_vote_pool& deregister_vote_pool):
+Blockchain::Blockchain(tx_memory_pool& tx_pool, super_nodes::super_node_list& super_node_list, super_nodes::deregister_vote_pool& deregister_vote_pool):
   m_db(), m_tx_pool(tx_pool), m_hardfork(NULL), m_timestamps_and_difficulties_height(0), m_current_block_cumul_weight_limit(0), m_current_block_cumul_weight_median(0),
   m_enforce_dns_checkpoints(false), m_max_prepare_blocks_threads(4), m_db_sync_on_blocks(true), m_db_sync_threshold(1), m_db_sync_mode(db_async), m_db_default_sync(false), m_fast_sync(true), m_show_time_stats(false), m_sync_counter(0), m_bytes_to_sync(0), m_cancel(false),
   m_long_term_block_weights_window(CRYPTONOTE_LONG_TERM_BLOCK_WEIGHT_WINDOW_SIZE),
   m_long_term_effective_median_block_weight(0),
   m_difficulty_for_next_block_top_hash(crypto::null_hash),
   m_difficulty_for_next_block(1),
-  m_service_node_list(service_node_list),
+  m_super_node_list(super_node_list),
   m_deregister_vote_pool(deregister_vote_pool),
   m_btc_valid(false)
 {
@@ -917,7 +917,7 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
     m_difficulties = difficulties;
   }
   size_t target = get_difficulty_target();
-  difficulty_type diff = next_difficulty_v2(timestamps, difficulties, target, version <= cryptonote::network_version_9_service_nodes);
+  difficulty_type diff = next_difficulty_v2(timestamps, difficulties, target, version <= cryptonote::network_version_9_super_nodes);
 
   CRITICAL_REGION_LOCAL1(m_difficulty_lock);
   m_difficulty_for_next_block_top_hash = top_hash;
@@ -1153,7 +1153,7 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
   size_t target = DIFFICULTY_TARGET_V2;
 
   // calculate the difficulty target for the block and return it
-  return next_difficulty_v2(timestamps, cumulative_difficulties, target, get_current_hard_fork_version() <= cryptonote::network_version_9_service_nodes);
+  return next_difficulty_v2(timestamps, cumulative_difficulties, target, get_current_hard_fork_version() <= cryptonote::network_version_9_super_nodes);
 }
 //------------------------------------------------------------------
 // This function does a sanity check on basic things that all miner
@@ -1426,8 +1426,8 @@ bool Blockchain::create_block_template(block& b, const account_public_address& m
   uint8_t hf_version = m_hardfork->get_current_version();
 
   sevabit_miner_tx_context miner_tx_context(m_nettype,
-                                         m_service_node_list.select_winner(),
-                                         m_service_node_list.get_winner_addresses_and_portions());
+                                         m_super_node_list.select_winner(),
+                                         m_super_node_list.get_winner_addresses_and_portions());
 
   if (!calc_batched_governance_reward(height, miner_tx_context.batched_governance))
   {
@@ -2739,23 +2739,23 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
       }
 
       //
-      // Service Node Checks
+      // Super Node Checks
       //
       if (hf_version >= cryptonote::network_version_11_infinite_staking)
       {
-        const std::vector<service_nodes::key_image_blacklist_entry> &blacklist = m_service_node_list.get_blacklisted_key_images();
+        const std::vector<super_nodes::key_image_blacklist_entry> &blacklist = m_super_node_list.get_blacklisted_key_images();
         for (const auto &entry : blacklist)
         {
           if (in_to_key.k_image == entry.key_image) // Check if key image is on the blacklist
           {
-            MERROR_VER("Key image: " << epee::string_tools::pod_to_hex(entry.key_image) << " is blacklisted by the service node network");
+            MERROR_VER("Key image: " << epee::string_tools::pod_to_hex(entry.key_image) << " is blacklisted by the super node network");
             tvc.m_key_image_blacklisted = true;
             return false;
           }
         }
 
         uint64_t unlock_height = 0;
-        if (m_service_node_list.is_key_image_locked(in_to_key.k_image, &unlock_height))
+        if (m_super_node_list.is_key_image_locked(in_to_key.k_image, &unlock_height))
         {
           MERROR_VER("Key image: " << epee::string_tools::pod_to_hex(in_to_key.k_image) << " is locked in a stake until height: " << unlock_height);
           tvc.m_key_image_locked_by_snode = true;
@@ -2934,21 +2934,21 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
       // Check the inputs (votes) of the transaction have not already been
       // submitted to the blockchain under another transaction using a different
       // combination of votes.
-      tx_extra_service_node_deregister deregister;
-      if (!get_service_node_deregister_from_tx_extra(tx.extra, deregister))
+      tx_extra_super_node_deregister deregister;
+      if (!get_super_node_deregister_from_tx_extra(tx.extra, deregister))
       {
         MERROR_VER("TX version deregister did not have the deregister metadata in the tx_extra");
         return false;
       }
 
-      const std::shared_ptr<const service_nodes::quorum_state> quorum_state = m_service_node_list.get_quorum_state(deregister.block_height);
+      const std::shared_ptr<const super_nodes::quorum_state> quorum_state = m_super_node_list.get_quorum_state(deregister.block_height);
       if (!quorum_state)
       {
         MERROR_VER("TX version 3 deregister_tx could not get quorum for height: " << deregister.block_height);
         return false;
       }
 
-      if (!service_nodes::deregister_vote::verify_deregister(nettype(), deregister, tvc.m_vote_ctx, *quorum_state))
+      if (!super_nodes::deregister_vote::verify_deregister(nettype(), deregister, tvc.m_vote_ctx, *quorum_state))
       {
         tvc.m_verifivation_failed = true;
         MERROR_VER("tx " << get_transaction_hash(tx) << ": version 3 deregister_tx could not be completely verified reason: " << print_vote_verification_context(tvc.m_vote_ctx));
@@ -2961,7 +2961,7 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
         if (deregister.block_height >= curr_height)
         {
           LOG_PRINT_L1("Received deregister tx for height: " << deregister.block_height
-                       << " and service node: "              << deregister.service_node_index
+                       << " and super node: "              << deregister.super_node_index
                        << ", is newer than current height: " << curr_height
                        << " blocks and has been rejected.");
           tvc.m_vote_ctx.m_invalid_block_height = true;
@@ -2970,11 +2970,11 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
         }
 
         uint64_t delta_height = curr_height - deregister.block_height;
-        if (delta_height >= service_nodes::deregister_vote::DEREGISTER_LIFETIME_BY_HEIGHT)
+        if (delta_height >= super_nodes::deregister_vote::DEREGISTER_LIFETIME_BY_HEIGHT)
         {
           LOG_PRINT_L1("Received deregister tx for height: " << deregister.block_height
-                       << " and service node: "     << deregister.service_node_index
-                       << ", is older than: "       << service_nodes::deregister_vote::DEREGISTER_LIFETIME_BY_HEIGHT
+                       << " and super node: "     << deregister.super_node_index
+                       << ", is older than: "       << super_nodes::deregister_vote::DEREGISTER_LIFETIME_BY_HEIGHT
                        << " blocks and has been rejected. The current height is: " << curr_height);
           tvc.m_vote_ctx.m_invalid_block_height = true;
           tvc.m_verifivation_failed             = true;
@@ -2983,7 +2983,7 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
       }
 
       const uint64_t height            = deregister.block_height;
-      const size_t num_blocks_to_check = service_nodes::deregister_vote::DEREGISTER_LIFETIME_BY_HEIGHT;
+      const size_t num_blocks_to_check = super_nodes::deregister_vote::DEREGISTER_LIFETIME_BY_HEIGHT;
 
       std::vector<std::pair<cryptonote::blobdata,block>> blocks;
       std::vector<cryptonote::blobdata> txs;
@@ -3004,22 +3004,22 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
         if (existing_tx.get_type() != transaction::type_deregister)
           continue;
 
-        tx_extra_service_node_deregister existing_deregister;
-        if (!get_service_node_deregister_from_tx_extra(existing_tx.extra, existing_deregister))
+        tx_extra_super_node_deregister existing_deregister;
+        if (!get_super_node_deregister_from_tx_extra(existing_tx.extra, existing_deregister))
         {
-          MERROR_VER("could not get service node deregister from tx extra, possibly corrupt tx");
+          MERROR_VER("could not get super node deregister from tx extra, possibly corrupt tx");
           continue;
         }
 
-        const std::shared_ptr<const service_nodes::quorum_state> existing_deregister_quorum_state = m_service_node_list.get_quorum_state(existing_deregister.block_height);
+        const std::shared_ptr<const super_nodes::quorum_state> existing_deregister_quorum_state = m_super_node_list.get_quorum_state(existing_deregister.block_height);
         if (!existing_deregister_quorum_state)
         {
           MERROR_VER("could not get quorum state for recent deregister tx");
           continue;
         }
 
-        if (existing_deregister_quorum_state->nodes_to_test[existing_deregister.service_node_index] ==
-            quorum_state->nodes_to_test[deregister.service_node_index])
+        if (existing_deregister_quorum_state->nodes_to_test[existing_deregister.super_node_index] ==
+            quorum_state->nodes_to_test[deregister.super_node_index])
         {
           MERROR_VER("Already seen this deregister tx (aka double spend)");
           tvc.m_double_spend = true;
@@ -3036,16 +3036,16 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
         return false;
       }
 
-      service_nodes::service_node_info::contribution_t contribution = {};
+      super_nodes::super_node_info::contribution_t contribution = {};
       uint64_t unlock_height = 0;
-      if (!m_service_node_list.is_key_image_locked(unlock.key_image, &unlock_height, &contribution))
+      if (!m_super_node_list.is_key_image_locked(unlock.key_image, &unlock_height, &contribution))
       {
         MERROR_VER("Requested key image: " << epee::string_tools::pod_to_hex(unlock.key_image) << " to unlock is not locked");
         tvc.m_invalid_input = true;
         return false;
       }
 
-      crypto::hash const hash = service_nodes::generate_request_stake_unlock_hash(unlock.nonce);
+      crypto::hash const hash = super_nodes::generate_request_stake_unlock_hash(unlock.nonce);
       if (!crypto::check_signature(hash, contribution.key_image_pub_key, unlock.signature))
       {
         MERROR("Could not verify key image unlock transaction signature for tx: " << get_transaction_hash(tx));
@@ -3053,7 +3053,7 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
       }
 
       // Otherwise is a locked key image, if the unlock_height is set, it has been previously requested to unlock
-      if (unlock_height != service_nodes::KEY_IMAGE_AWAITING_UNLOCK_HEIGHT)
+      if (unlock_height != super_nodes::KEY_IMAGE_AWAITING_UNLOCK_HEIGHT)
       {
         tvc.m_double_spend = true;
         return false;
@@ -4214,7 +4214,7 @@ bool Blockchain::calc_batched_governance_reward(uint64_t height, uint64_t &rewar
 {
   reward = 0;
   int hard_fork_version = get_ideal_hard_fork_version(height);
-  if (hard_fork_version <= network_version_9_service_nodes)
+  if (hard_fork_version <= network_version_9_super_nodes)
   {
     return true;
   }

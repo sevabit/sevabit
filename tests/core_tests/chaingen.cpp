@@ -181,7 +181,7 @@ cryptonote::block linear_chain_generator::create_block_on_fork(const cryptonote:
   /// Note: depending on whether we check in hf9 or later, loki assignes different meaning to
   /// "expiration height": in hf9 it expires nodes at their expiration height; after hf9 --
   /// a the expiration height + 1.
-  if (get_hf_version() == network_version_9_service_nodes) {
+  if (get_hf_version() == network_version_9_super_nodes) {
     sn_list_.expire_old(height);
   } else {
     sn_list_.expire_old(height - 1);
@@ -192,8 +192,8 @@ cryptonote::block linear_chain_generator::create_block_on_fork(const cryptonote:
 
 QuorumState linear_chain_generator::get_quorum_idxs(const cryptonote::block& block) const
 {
-  if (sn_list_.size() <= service_nodes::QUORUM_SIZE) {
-    std::cerr << "Not enough service nodes\n";
+  if (sn_list_.size() <= super_nodes::QUORUM_SIZE) {
+    std::cerr << "Not enough super nodes\n";
     return {};
   }
 
@@ -208,16 +208,16 @@ QuorumState linear_chain_generator::get_quorum_idxs(const cryptonote::block& blo
       pub_keys_indexes[i] = i;
     }
 
-    service_nodes::sevabit_shuffle(pub_keys_indexes, seed);
+    super_nodes::sevabit_shuffle(pub_keys_indexes, seed);
   }
 
   QuorumState quorum;
 
-  for (auto i = 0u; i < service_nodes::QUORUM_SIZE; ++i) {
+  for (auto i = 0u; i < super_nodes::QUORUM_SIZE; ++i) {
     quorum.voters.push_back({ sn_list_.at(pub_keys_indexes[i]).keys.pub, i });
   }
 
-  for (auto i = service_nodes::QUORUM_SIZE; i < pub_keys_indexes.size(); ++i) {
+  for (auto i = super_nodes::QUORUM_SIZE; i < pub_keys_indexes.size(); ++i) {
     quorum.to_test.push_back({ sn_list_.at(pub_keys_indexes[i]).keys.pub, i });
   }
 
@@ -245,11 +245,11 @@ cryptonote::transaction linear_chain_generator::create_registration_tx(const cry
                                                                        const cryptonote::keypair& sn_keys)
 {
   const sn_contributor_t contr = { acc.get_keys().m_account_address, STAKING_PORTIONS };
-  uint32_t expires = height() + service_nodes::staking_num_lock_blocks(cryptonote::FAKECHAIN);
+  uint32_t expires = height() + super_nodes::staking_num_lock_blocks(cryptonote::FAKECHAIN);
 
-  /// Account for some inconsistency in service_nodes::staking_num_lock_blocks
+  /// Account for some inconsistency in super_nodes::staking_num_lock_blocks
   /// on the boundary between hardforks 9 and 10
-  if (get_hf_version() == cryptonote::network_version_9_service_nodes &&
+  if (get_hf_version() == cryptonote::network_version_9_super_nodes &&
       get_hf_version_at(expires) == cryptonote::network_version_10_bulletproofs)
   {
     expires += STAKING_REQUIREMENT_LOCK_BLOCKS_EXCESS;
@@ -274,16 +274,16 @@ cryptonote::transaction linear_chain_generator::create_deregister_tx(const crypt
                                                                      bool commit)
 {
 
-  cryptonote::tx_extra_service_node_deregister deregister;
+  cryptonote::tx_extra_super_node_deregister deregister;
   deregister.block_height = height;
 
   const auto idx = get_idx_in_tested(pk, height);
 
-  if (!idx) { MERROR("service node could not be found in the servcie node list"); throw std::exception(); }
+  if (!idx) { MERROR("super node could not be found in the servcie node list"); throw std::exception(); }
 
-  deregister.service_node_index = *idx; /// idx inside nodes to test
+  deregister.super_node_index = *idx; /// idx inside nodes to test
 
-  /// need to create MIN_VOTES_TO_KICK_SERVICE_NODE (7) votes
+  /// need to create MIN_VOTES_TO_KICK_SUPER_NODE (7) votes
   for (const auto voter : voters) {
 
     const auto reg = sn_list_.find_registration(voter.sn_pk);
@@ -293,7 +293,7 @@ cryptonote::transaction linear_chain_generator::create_deregister_tx(const crypt
     const auto pk = reg->keys.pub;
     const auto sk = reg->keys.sec;
     const auto signature =
-      service_nodes::deregister_vote::sign_vote(deregister.block_height, deregister.service_node_index, pk, sk);
+      super_nodes::deregister_vote::sign_vote(deregister.block_height, deregister.super_node_index, pk, sk);
 
     deregister.votes.push_back({ signature, (uint32_t)voter.idx_in_quorum });
   }
@@ -319,7 +319,7 @@ boost::optional<uint32_t> linear_chain_generator::get_idx_in_tested(const crypto
   const auto& to_test = get_quorum_idxs(height).to_test;
 
   for (const auto& sn : to_test) {
-    if (sn.sn_pk == pk) return sn.idx_in_quorum - service_nodes::QUORUM_SIZE;
+    if (sn.sn_pk == pk) return sn.idx_in_quorum - super_nodes::QUORUM_SIZE;
   }
 
   return boost::none;
@@ -668,7 +668,7 @@ bool test_generator::construct_block_manually_tx(cryptonote::block& blk, const c
 
 cryptonote::transaction make_registration_tx(std::vector<test_event_entry>& events,
                                              const cryptonote::account_base& account,
-                                             const cryptonote::keypair& service_node_keys,
+                                             const cryptonote::keypair& super_node_keys,
                                              uint64_t operator_cut,
                                              const std::vector<cryptonote::account_public_address>& addresses,
                                              const std::vector<uint64_t>& portions,
@@ -676,15 +676,15 @@ cryptonote::transaction make_registration_tx(std::vector<test_event_entry>& even
                                              uint8_t hf_version)
 {
     const auto new_height = cryptonote::get_block_height(head) + 1;
-    const auto staking_requirement = service_nodes::get_staking_requirement(cryptonote::FAKECHAIN, new_height, hf_version);
+    const auto staking_requirement = super_nodes::get_staking_requirement(cryptonote::FAKECHAIN, new_height, hf_version);
 
-    uint64_t amount = service_nodes::portions_to_amount(portions[0], staking_requirement);
+    uint64_t amount = super_nodes::portions_to_amount(portions[0], staking_requirement);
 
     cryptonote::transaction tx;
-    const auto unlock_time = new_height + service_nodes::staking_num_lock_blocks(cryptonote::FAKECHAIN);
+    const auto unlock_time = new_height + super_nodes::staking_num_lock_blocks(cryptonote::FAKECHAIN);
 
     std::vector<uint8_t> extra;
-    add_service_node_pubkey_to_tx_extra(extra, service_node_keys.pub);
+    add_super_node_pubkey_to_tx_extra(extra, super_node_keys.pub);
 
     const uint64_t exp_timestamp = time(nullptr) + STAKING_AUTHORIZATION_EXPIRATION_WINDOW;
 
@@ -696,10 +696,10 @@ cryptonote::transaction make_registration_tx(std::vector<test_event_entry>& even
     }
 
     crypto::signature signature;
-    crypto::generate_signature(hash, service_node_keys.pub, service_node_keys.sec, signature);
+    crypto::generate_signature(hash, super_node_keys.pub, super_node_keys.sec, signature);
 
-    add_service_node_register_to_tx_extra(extra, addresses, operator_cut, portions, exp_timestamp, signature);
-    add_service_node_contributor_to_tx_extra(extra, addresses.at(0));
+    add_super_node_register_to_tx_extra(extra, addresses, operator_cut, portions, exp_timestamp, signature);
+    add_super_node_contributor_to_tx_extra(extra, addresses.at(0));
 
     TxBuilder(events, tx, head, account, account, amount, hf_version).is_staking(true).with_extra(extra).with_unlock_time(unlock_time).with_per_output_unlock(true).build();
     events.push_back(tx);
@@ -709,14 +709,14 @@ cryptonote::transaction make_registration_tx(std::vector<test_event_entry>& even
 cryptonote::transaction make_deregistration_tx(const std::vector<test_event_entry>& events,
                                                const cryptonote::account_base& account,
                                                const cryptonote::block& head,
-                                               const cryptonote::tx_extra_service_node_deregister& deregister,
+                                               const cryptonote::tx_extra_super_node_deregister& deregister,
                                                uint8_t hf_version,
                                                uint64_t fee)
 {
   cryptonote::transaction tx;
 
   std::vector<uint8_t> extra;
-  const bool full_tx_deregister_made = cryptonote::add_service_node_deregister_to_tx_extra(tx.extra, deregister);
+  const bool full_tx_deregister_made = cryptonote::add_super_node_deregister_to_tx_extra(tx.extra, deregister);
 
   if (!full_tx_deregister_made) {
     MERROR("Could not add deregister to extra");
@@ -735,11 +735,11 @@ cryptonote::transaction make_deregistration_tx(const std::vector<test_event_entr
 
 cryptonote::transaction make_default_registration_tx(std::vector<test_event_entry>& events,
                                              const cryptonote::account_base& account,
-                                             const cryptonote::keypair& service_node_keys,
+                                             const cryptonote::keypair& super_node_keys,
                                              const cryptonote::block& head,
                                              uint8_t hf_version)
 {
-  return make_registration_tx(events, account, service_node_keys, 0, { account.get_keys().m_account_address }, { STAKING_PORTIONS }, head, hf_version);
+  return make_registration_tx(events, account, super_node_keys, 0, { account.get_keys().m_account_address }, { STAKING_PORTIONS }, head, hf_version);
 }
 
 struct output_index {

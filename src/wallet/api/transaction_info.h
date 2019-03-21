@@ -38,7 +38,7 @@ class TransactionHistoryImpl;
 
 enum class reward_type {
     unspecified,
-    service_node,
+    super_node,
     miner
 };
 
@@ -66,7 +66,7 @@ public:
     virtual const std::vector<Transfer> &transfers() const override;
     virtual uint64_t confirmations() const override;
     virtual uint64_t unlockTime() const override;
-    bool isServiceNodeReward() const override;
+    bool isSuperNodeReward() const override;
     bool isMinerReward() const override;
 
 private:

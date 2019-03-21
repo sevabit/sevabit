@@ -54,9 +54,9 @@ public:
   boost::optional<std::string> get_fee_quantization_mask(uint64_t &fee_quantization_mask) const;
   boost::optional<uint8_t>     get_hardfork_version() const;
 
-  std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry>             get_service_nodes(std::vector<std::string> const &pubkeys, boost::optional<std::string> &failed) const;
-  std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry>             get_all_service_nodes(boost::optional<std::string> &failed) const;
-  std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODE_BLACKLISTED_KEY_IMAGES::entry> get_service_node_blacklisted_key_images(boost::optional<std::string> &failed) const;
+  std::vector<cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::entry>             get_super_nodes(std::vector<std::string> const &pubkeys, boost::optional<std::string> &failed) const;
+  std::vector<cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::entry>             get_all_super_nodes(boost::optional<std::string> &failed) const;
+  std::vector<cryptonote::COMMAND_RPC_GET_SUPER_NODE_BLACKLISTED_KEY_IMAGES::entry> get_super_node_blacklisted_key_images(boost::optional<std::string> &failed) const;
 
 private:
   boost::optional<std::string> get_info() const;
@@ -64,11 +64,11 @@ private:
   epee::net_utils::http::http_simple_client &m_http_client;
   boost::mutex &m_daemon_rpc_mutex;
 
-  mutable uint64_t m_service_node_blacklisted_key_images_cached_height;
-  mutable std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODE_BLACKLISTED_KEY_IMAGES::entry> m_service_node_blacklisted_key_images;
+  mutable uint64_t m_super_node_blacklisted_key_images_cached_height;
+  mutable std::vector<cryptonote::COMMAND_RPC_GET_SUPER_NODE_BLACKLISTED_KEY_IMAGES::entry> m_super_node_blacklisted_key_images;
 
-  mutable uint64_t m_all_service_nodes_cached_height;
-  mutable std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry> m_all_service_nodes;
+  mutable uint64_t m_all_super_nodes_cached_height;
+  mutable std::vector<cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::entry> m_all_super_nodes;
 
   mutable uint64_t m_height;
   mutable uint64_t m_earliest_height[256];

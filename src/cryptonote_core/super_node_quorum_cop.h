@@ -36,7 +36,7 @@ namespace cryptonote
   class core;
 };
 
-namespace service_nodes
+namespace super_nodes
 {
   class quorum_cop
     : public cryptonote::Blockchain::BlockAddedHook,

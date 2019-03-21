@@ -41,9 +41,9 @@
 #include "common/command_line.h"
 #include "tx_pool.h"
 #include "blockchain.h"
-#include "service_node_deregister.h"
-#include "service_node_list.h"
-#include "service_node_quorum_cop.h"
+#include "super_node_deregister.h"
+#include "super_node_list.h"
+#include "super_node_quorum_cop.h"
 #include "cryptonote_basic/miner.h"
 #include "cryptonote_basic/connection_context.h"
 #include "cryptonote_basic/cryptonote_stat_info.h"
@@ -806,75 +806,75 @@ namespace cryptonote
      bool offline() const { return m_offline; }
 
      /**
-      * @brief Get the deterministic list of service node's public keys for quorum testing
+      * @brief Get the deterministic list of super node's public keys for quorum testing
       *
       * @param height Block height to deterministically recreate the quorum list from
 
       * @return Null shared ptr if quorum has not been determined yet for height
       */
-     const std::shared_ptr<const service_nodes::quorum_state> get_quorum_state(uint64_t height) const;
+     const std::shared_ptr<const super_nodes::quorum_state> get_quorum_state(uint64_t height) const;
 
      /**
       * @brief Get a non owning reference to the list of blacklisted key images
       */
-     const std::vector<service_nodes::key_image_blacklist_entry> &get_service_node_blacklisted_key_images() const;
+     const std::vector<super_nodes::key_image_blacklist_entry> &get_super_node_blacklisted_key_images() const;
 
      /**
-      * @brief get a snapshot of the service node list state at the time of the call.
+      * @brief get a snapshot of the super node list state at the time of the call.
       *
-      * @param service_node_pubkeys pubkeys to search, if empty this indicates get all the pubkeys
+      * @param super_node_pubkeys pubkeys to search, if empty this indicates get all the pubkeys
       *
-      * @return all the service nodes that can be matched from pubkeys in param
+      * @return all the super nodes that can be matched from pubkeys in param
       */
-     std::vector<service_nodes::service_node_pubkey_info> get_service_node_list_state(const std::vector<crypto::public_key>& service_node_pubkeys) const;
+     std::vector<super_nodes::super_node_pubkey_info> get_super_node_list_state(const std::vector<crypto::public_key>& super_node_pubkeys) const;
 
     /**
-      * @brief get whether `pubkey` is known as a service node
+      * @brief get whether `pubkey` is known as a super node
       *
       * @param pubkey the public key to test
       *
-      * @return whether `pubkey` is known as a service node
+      * @return whether `pubkey` is known as a super node
       */
-    bool is_service_node(const crypto::public_key& pubkey) const;
+    bool is_super_node(const crypto::public_key& pubkey) const;
      /**
-      * @brief Add a vote to deregister a service node from network
+      * @brief Add a vote to deregister a super node from network
       *
-      * @param vote The vote for deregistering a service node.
+      * @param vote The vote for deregistering a super node.
 
       * @return Whether the vote was added to the partial deregister pool
       */
-     bool add_deregister_vote(const service_nodes::deregister_vote& vote, vote_verification_context &vvc);
+     bool add_deregister_vote(const super_nodes::deregister_vote& vote, vote_verification_context &vvc);
 
      /**
-      * @brief Get the keypair for this service node.
+      * @brief Get the keypair for this super node.
 
-      * @param pub_key The public key for the service node, unmodified if not a service node
+      * @param pub_key The public key for the super node, unmodified if not a super node
 
-      * @param sec_key The secret key for the service node, unmodified if not a service node
+      * @param sec_key The secret key for the super node, unmodified if not a super node
 
-      * @return True if we are a service node
+      * @return True if we are a super node
       */
-     bool get_service_node_keys(crypto::public_key &pub_key, crypto::secret_key &sec_key) const;
+     bool get_super_node_keys(crypto::public_key &pub_key, crypto::secret_key &sec_key) const;
 
      /**
-      * @brief Get the public key of every service node.
+      * @brief Get the public key of every super node.
       *
       * @param keys The container in which to return the keys
       * @param fully_funded_nodes_only Only return nodes that are funded and hence working on the network
       */
-     void get_all_service_nodes_public_keys(std::vector<crypto::public_key>& keys, bool fully_funded_nodes_only) const;
+     void get_all_super_nodes_public_keys(std::vector<crypto::public_key>& keys, bool fully_funded_nodes_only) const;
 
      /**
-      * @brief attempts to submit an uptime proof to the network, if this is running in service node mode
+      * @brief attempts to submit an uptime proof to the network, if this is running in super node mode
       *
       * @return true
       */
      bool submit_uptime_proof();
 
      /**
-      * @brief Try find the uptime proof from the service node.
+      * @brief Try find the uptime proof from the super node.
       *
-      * @param key The public key of the service node
+      * @param key The public key of the super node
       *
       * @return 0 if no uptime proof found, otherwise the timestamp it last received in epoch time
       */
@@ -1088,11 +1088,11 @@ namespace cryptonote
      bool check_disk_space();
 
      /**
-      * @brief Initializes service node key by loading or creating.
+      * @brief Initializes super node key by loading or creating.
       *
       * @return true on success, false otherwise
       */
-     bool init_service_node_key();
+     bool init_super_node_key();
 
      /**
       * @brief do the uptime proof logic and calls for idle loop.
@@ -1113,9 +1113,9 @@ namespace cryptonote
      tx_memory_pool m_mempool; //!< transaction pool instance
      Blockchain m_blockchain_storage; //!< Blockchain instance
 
-     service_nodes::deregister_vote_pool m_deregister_vote_pool;
-     service_nodes::service_node_list    m_service_node_list;
-     service_nodes::quorum_cop           m_quorum_cop;
+     super_nodes::deregister_vote_pool m_deregister_vote_pool;
+     super_nodes::super_node_list    m_super_node_list;
+     super_nodes::quorum_cop           m_quorum_cop;
 
      i_cryptonote_protocol* m_pprotocol; //!< cryptonote protocol instance
 
@@ -1155,9 +1155,9 @@ namespace cryptonote
      std::atomic_flag m_checkpoints_updating; //!< set if checkpoints are currently updating to avoid multiple threads attempting to update at once
      bool m_disable_dns_checkpoints;
 
-     bool m_service_node;
-     crypto::secret_key m_service_node_key;
-     crypto::public_key m_service_node_pubkey;
+     bool m_super_node;
+     crypto::secret_key m_super_node_key;
+     crypto::public_key m_super_node_pubkey;
 
      size_t block_sync_size;
 

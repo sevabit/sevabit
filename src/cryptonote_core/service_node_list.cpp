@@ -100,7 +100,6 @@ namespace service_nodes
 
     uint64_t current_height = m_blockchain.get_current_blockchain_height();
     bool loaded = load();
-
     if (loaded && m_height == current_height) return;
 
     if (!loaded || m_height > current_height) clear(true);
@@ -723,7 +722,7 @@ namespace service_nodes
 
     // check the initial contribution exists
 
-    info.staking_requirement = get_staking_requirement(m_blockchain.nettype(), block_height);
+    info.staking_requirement = get_staking_requirement(m_blockchain.nettype(), block_height, hf_version);
 
     cryptonote::account_public_address address;
 

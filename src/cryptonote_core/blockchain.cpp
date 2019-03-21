@@ -94,7 +94,8 @@ struct hard_fork_record
   time_t time;
 };
 
-// version 7 from the start of the blockchain, inherited from Monero mainnet
+// TODO(doyle): Move this out into a globally accessible object
+// version 7 from the start of the blockchain, inhereted from Monero mainnet
 static const hard_fork_record mainnet_hard_forks[] =
 {
   { network_version_7,               1, 0, 1543540000 },

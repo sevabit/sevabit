@@ -424,13 +424,13 @@ namespace nodetool
     std::set<std::string> full_addrs;
     if (nettype == cryptonote::TESTNET)
     {
-      full_addrs.insert("seed1.sevabit.com:29090");   
-      full_addrs.insert("seed2.sevabit.com:29090");
+      full_addrs.insert("seed1.sevabit.com:23048");   
+      full_addrs.insert("seed2.sevabit.com:23048");
     }
     else if (nettype == cryptonote::STAGENET)
     {
-      full_addrs.insert("seed1.sevabit.com:39090");   
-      full_addrs.insert("seed2.sevabit.com:39090");
+      full_addrs.insert("seed1.sevabit.com:24048");   
+      full_addrs.insert("seed2.sevabit.com:24048");
     }
     else if (nettype == cryptonote::FAKECHAIN)
     {

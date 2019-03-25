@@ -108,7 +108,7 @@ namespace cryptonote {
     }
 
     if (version >= 11)
-     base_reward = 80.0; //improve emission for community
+     base_reward = 80000000000; //improve emission for community
     else if (version >= 8)
       base_reward = 28000000000.0 + 100000000000.0 / sevabit::exp2(height / (720.0 * 90.0)); // halve every 90 days.
   

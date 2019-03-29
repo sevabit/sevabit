@@ -262,6 +262,8 @@ namespace cryptonote
     network_version_9_super_nodes, // Proof Of Stake w/ Super Nodes
     network_version_10_bulletproofs, // Bulletproofs, Super Node Grace Registration Period, Batched Governance
     network_version_11_infinite_staking,
+
+    network_version_count,
   };
 
   enum network_type : uint8_t

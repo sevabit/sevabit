@@ -2215,6 +2215,10 @@ void wallet2::process_new_blockchain_entry(const cryptonote::block& b, const cry
     }
     TIME_MEASURE_FINISH(txs_handle_time);
     m_last_block_reward = cryptonote::get_outs_money_amount(b.miner_tx);
+
+    if (height > 0 && ((height % 2000) == 0))
+      LOG_PRINT_L0("Blockchain sync progress: " << bl_id << ", height " << height);
+
     LOG_PRINT_L2("Processed block: " << bl_id << ", height " << height << ", " <<  miner_tx_handle_time + txs_handle_time << "(" << miner_tx_handle_time << "/" << txs_handle_time <<")ms");
   }else
   {
@@ -7090,7 +7094,7 @@ static const char *ERR_MSG_NETWORK_VERSION_QUERY_FAILED = tr("Could not query th
 static const char *ERR_MSG_NETWORK_HEIGHT_QUERY_FAILED = tr("Could not query the current network block height, try later: ");
 static const char *ERR_MSG_SUPER_NODE_LIST_QUERY_FAILED = tr("Failed to query daemon for super node list");
 static const char *ERR_MSG_TOO_MANY_TXS_CONSTRUCTED = tr("Constructed too many transations, please sweep_all first");
-static const char *ERR_MSG_EXCEPTION_THROWN = tr("Exception thrown, staking process could not be completed");
+static const char *ERR_MSG_EXCEPTION_THROWN = tr("Exception thrown, staking process could not be completed: ");
 
 wallet2::stake_result wallet2::check_stake_allowed(const crypto::public_key& sn_key, const cryptonote::address_parse_info& addr_info, uint64_t& amount, double fraction)
 {
@@ -7484,9 +7488,7 @@ wallet2::register_super_node_result wallet2::create_register_super_node_tx(const
       if (response.size() >= 1)
       {
         bool can_reregister = false;
-        if (use_fork_rules(cryptonote::network_version_11_infinite_staking, 1))
-          unlock_block = 0; // Infinite staking, no time lock
-        else if (use_fork_rules(cryptonote::network_version_10_bulletproofs, 0))
+        if (use_fork_rules(cryptonote::network_version_10_bulletproofs, 0))
         {
           cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::entry const &node_info = response[0];
           uint64_t expiry_height = node_info.registration_height + staking_requirement_lock_blocks;
@@ -7504,15 +7506,33 @@ wallet2::register_super_node_result wallet2::create_register_super_node_tx(const
     }
   }
 
+  if (use_fork_rules(cryptonote::network_version_11_infinite_staking, 1))
+    unlock_block = 0;
+
   //
   // Create Register Transaction
   //
   {
+    uint64_t amount_payable_by_operator = 0;
+    {
+      const uint64_t DUST                 = MAX_NUMBER_OF_CONTRIBUTORS;
+      uint64_t amount_left                = staking_requirement;
+      for (size_t i = 0; i < converted_args.portions.size(); i++)
+      {
+        uint64_t amount = super_nodes::portions_to_amount(staking_requirement, converted_args.portions[i]);
+        if (i == 0) amount_payable_by_operator += amount;
+        amount_left -= amount;
+      }
+
+      if (amount_left <= DUST)
+        amount_payable_by_operator += amount_left;
+    }
+
     vector<cryptonote::tx_destination_entry> dsts;
     cryptonote::tx_destination_entry de;
     de.addr = address;
     de.is_subaddress = false;
-    de.amount = super_nodes::portions_to_amount(converted_args.portions[0], staking_requirement);
+    de.amount = amount_payable_by_operator;
     dsts.push_back(de);
 
     try
@@ -11557,7 +11577,7 @@ uint64_t wallet2::get_daemon_blockchain_target_height(string &err)
 uint64_t wallet2::get_approximate_blockchain_height() const
 {
   const int seconds_per_block         = DIFFICULTY_TARGET_V2;
-  const time_t epochTimeMiningStarted = (m_nettype == TESTNET || m_nettype == STAGENET ?  1536137083 : 1525067730) + (60 * 60 * 24 * 7); // 2018-04-30 ~3:55PM + 1 week to be conservative.
+  const time_t epochTimeMiningStarted = (m_nettype == TESTNET || m_nettype == STAGENET ?  1551950093: 1525067730) + (60 * 60 * 24 * 7); // 2018-04-30 ~3:55PM + 1 week to be conservative.
   const time_t currentTime            = time(NULL);
   uint64_t approx_blockchain_height   = (currentTime < epochTimeMiningStarted) ? 0 : (currentTime - epochTimeMiningStarted)/seconds_per_block;
   LOG_PRINT_L2("Calculated blockchain height: " << approx_blockchain_height);

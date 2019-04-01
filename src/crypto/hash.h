@@ -75,7 +75,7 @@ namespace crypto {
   {
       heavy_v1,
       heavy_v2,
-      turtle_lite_v2,
+      cn_conceal_v0,
   };
 
   inline void cn_slow_hash(const void *data, std::size_t length, hash &hash, cn_slow_hash_type type) {
@@ -91,20 +91,10 @@ namespace crypto {
         else                                     v2.hash(data, length, hash.data);
       }
       break;
-
-      case cn_slow_hash_type::turtle_lite_v2:
+      case cn_slow_hash_type::cn_conceal_v0:
       default:
       {
-         const uint32_t CN_TURTLE_PAGE_SIZE = 262144;
-         const uint32_t CN_TURTLE_SCRATCHPAD = 262144;
-         const uint32_t CN_TURTLE_ITERATIONS = 131072;
-         cn_turtle_hash(data,
-             length,
-             hash.data,
-             1, // light
-             2, // variant
-             0, // pre-hashed
-             CN_TURTLE_PAGE_SIZE, CN_TURTLE_SCRATCHPAD, CN_TURTLE_ITERATIONS);
+         crypto::cn_conceal_slow_hash_v0(data, length, hash.data);
       }
       break;
     }

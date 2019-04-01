@@ -1453,7 +1453,7 @@ namespace cryptonote
     crypto::cn_slow_hash_type cn_type = cn_slow_hash_type::heavy_v1;
 
     if (hf_version >= network_version_11_infinite_staking)
-      cn_type = cn_slow_hash_type::turtle_lite_v2;
+      cn_type = cn_slow_hash_type::cn_conceal_v0;
     else if (height >= 9063)
       cn_type = crypto::cn_slow_hash_type::heavy_v2;
 

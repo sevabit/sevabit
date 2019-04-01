@@ -24,7 +24,7 @@ static inline uint64_t _umul128(uint64_t a, uint64_t b, uint64_t* hi)
     return (uint64_t)r;
 }
 
-#include <cpuid.h>
+
 #endif // !defined(HAS_WIN_INTRIN_API)
 #endif // __GNUC__
 

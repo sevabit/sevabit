@@ -5619,27 +5619,20 @@ bool wallet2::is_transfer_unlocked(uint64_t unlock_time, uint64_t block_height, 
   }
 
   {
+    const std::string primary_address = get_address_as_str();
     boost::optional<std::string> failed;
-    std::vector<cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::entry> super_nodes_states = m_node_rpc_proxy.get_all_super_nodes(failed);
+    std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry> service_nodes_states = m_node_rpc_proxy.get_contributed_service_nodes(primary_address, failed);
     if (failed)
     {
       LOG_PRINT_L1("Failed to query super node for locked transfers, assuming transfer not locked, reason: " << *failed);
       return true;
     }
 
-    cryptonote::account_public_address const primary_address = get_address();
-    for (cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::entry const &entry : super_nodes_states)
+    for (cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry const &entry : service_nodes_states)
     {
       for (cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::contributor const &contributor : entry.contributors)
       {
-        address_parse_info address_info = {};
-        if (!cryptonote::get_account_address_from_str(address_info, nettype(), contributor.address))
-        {
-          MERROR("Failed to parse string representation of address: " << contributor.address);
-          continue;
-        }
-
-        if (primary_address != address_info.address)
+        if (primary_address != contributor.address)
           continue;
 
         for (cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::contribution const &contribution : contributor.locked_contributions)
@@ -7099,6 +7092,7 @@ static const char *ERR_MSG_EXCEPTION_THROWN = tr("Exception thrown, staking proc
 wallet2::stake_result wallet2::check_stake_allowed(const crypto::public_key& sn_key, const cryptonote::address_parse_info& addr_info, uint64_t& amount, double fraction)
 {
   wallet2::stake_result result = {};
+  result.status                = wallet2::stake_result_status::invalid;
   result.msg.reserve(128);
 
   if (addr_info.has_payment_id)
@@ -7132,6 +7126,7 @@ wallet2::stake_result wallet2::check_stake_allowed(const crypto::public_key& sn_
     result.msg.reserve(failed->size() + 128);
     result.msg    = ERR_MSG_NETWORK_VERSION_QUERY_FAILED;
     result.msg    += *failed;
+    return result;
   }
 
   if (response.size() != 1)
@@ -7236,6 +7231,7 @@ wallet2::stake_result wallet2::check_stake_allowed(const crypto::public_key& sn_
 wallet2::stake_result wallet2::create_stake_tx(const crypto::public_key& super_node_key, const cryptonote::address_parse_info& addr_info, uint64_t amount, double amount_fraction, uint32_t priority, uint32_t subaddr_account, std::set<uint32_t> subaddr_indices)
 {
   wallet2::stake_result result = {};
+  result.status                = wallet2::stake_result_status::invalid;
 
   try
   {
@@ -7313,13 +7309,15 @@ wallet2::stake_result wallet2::create_stake_tx(const crypto::public_key& super_n
     return result;
   }
 
+  assert(result.status != stake_result_status::invalid);
   return result;
 }
 
 wallet2::register_super_node_result wallet2::create_register_super_node_tx(const std::vector<std::string> &args_, uint32_t subaddr_account)
 {
   std::vector<std::string> local_args = args_;
-  register_super_node_result result = {};
+  register_service_node_result result = {};
+  result.status                       = register_service_node_result_status::invalid;
 
   //
   // Parse Tx Args
@@ -7356,6 +7354,14 @@ wallet2::register_super_node_result wallet2::create_register_super_node_tx(const
   //
   // Parse Registration Contributor Args
   //
+  boost::optional<uint8_t> hf_version = get_hard_fork_version();
+  if (!hf_version)
+  {
+    result.status = register_service_node_result_status::network_version_query_failed;
+    result.msg    = ERR_MSG_NETWORK_VERSION_QUERY_FAILED;
+    return result;
+  }
+
   uint64_t staking_requirement = 0, bc_height = 0;
   super_nodes::converted_registration_args converted_args = {};
   {
@@ -7379,15 +7385,7 @@ wallet2::register_super_node_result wallet2::create_register_super_node_tx(const
       }
     }
 
-    boost::optional<uint8_t> hf_version = get_hard_fork_version();
-    if (!hf_version)
-    {
-      result.status = register_super_node_result_status::network_version_query_failed;
-      result.msg    = ERR_MSG_NETWORK_VERSION_QUERY_FAILED;
-      return result;
-    }
-
-    staking_requirement = super_nodes::get_staking_requirement(nettype(), bc_height, *hf_version);
+    staking_requirement = service_nodes::get_staking_requirement(nettype(), bc_height, *hf_version);
     std::vector<std::string> const registration_args(local_args.begin(), local_args.begin() + local_args.size() - 3);
     converted_args = super_nodes::convert_registration_args(nettype(), registration_args, staking_requirement, *hf_version);
 
@@ -7488,7 +7486,7 @@ wallet2::register_super_node_result wallet2::create_register_super_node_tx(const
       if (response.size() >= 1)
       {
         bool can_reregister = false;
-        if (use_fork_rules(cryptonote::network_version_10_bulletproofs, 0))
+        if (*hf_version == cryptonote::network_version_10_bulletproofs)
         {
           cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::entry const &node_info = response[0];
           uint64_t expiry_height = node_info.registration_height + staking_requirement_lock_blocks;
@@ -7560,10 +7558,10 @@ wallet2::register_super_node_result wallet2::create_register_super_node_tx(const
       result.msg += e.what();
       return result;
     }
-
-    result.status = register_super_node_result_status::success;
-    return result;
   }
+
+  assert(result.status != register_service_node_result_status::invalid);
+  return result;
 }
 
 wallet2::request_stake_unlock_result wallet2::can_request_stake_unlock(const crypto::public_key &sn_key)
@@ -7868,12 +7866,9 @@ void wallet2::get_outs(std::vector<std::vector<tools::wallet2::get_outs_entry>> 
         max_rct_index = std::max(max_rct_index, m_transfers[idx].m_global_output_index);
       }
 
-    // TODO(doyle): Write the error message
     std::vector<uint64_t> output_blacklist;
     if (bool get_output_blacklist_failed = !get_output_blacklist(output_blacklist))
-    {
-      THROW_WALLET_EXCEPTION_IF(get_output_blacklist_failed, error::get_output_distribution, "Couldn't retrive list of outputs that are to be exlcuded from selection");
-    }
+      THROW_WALLET_EXCEPTION_IF(get_output_blacklist_failed, error::get_output_blacklist, "Couldn't retrive list of outputs that are to be exlcuded from selection");
 
     std::sort(output_blacklist.begin(), output_blacklist.end());
     const bool has_rct_distribution = has_rct && get_rct_distribution(rct_start_height, rct_offsets);
@@ -10084,7 +10079,7 @@ skip_tx:
   return ptx_vector;
 }
 
-std::vector<wallet2::pending_tx> wallet2::create_transactions_all(uint64_t below, const cryptonote::account_public_address &address, bool is_subaddress, const size_t outputs, const size_t fake_outs_count, const uint64_t unlock_time, uint32_t priority, const std::vector<uint8_t>& extra, uint32_t subaddr_account, std::set<uint32_t> subaddr_indices, bool is_staking_tx)
+std::vector<wallet2::pending_tx> wallet2::create_transactions_all(uint64_t below, const cryptonote::account_public_address &address, bool is_subaddress, const size_t outputs, const size_t fake_outs_count, const uint64_t unlock_time, uint32_t priority, const std::vector<uint8_t>& extra, uint32_t subaddr_account, std::set<uint32_t> subaddr_indices, bool is_staking_tx, sweep_style_t sweep_style)
 {
   std::vector<size_t> unused_transfers_indices;
   std::vector<size_t> unused_dust_indices;
@@ -10104,6 +10099,9 @@ std::vector<wallet2::pending_tx> wallet2::create_transactions_all(uint64_t below
       fund_found = true;
       if (below == 0 || td.amount() < below)
       {
+        if (td.m_tx.version <= transaction::version_1 && sweep_style != sweep_style_t::use_v1_tx)
+          continue;
+
         if ((td.is_rct()) || is_valid_decomposed_amount(td.amount()))
           unused_transfer_dust_indices_per_subaddr[td.m_subaddr_index.minor].first.push_back(i);
         else

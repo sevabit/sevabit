@@ -52,9 +52,9 @@ void NodeRPCProxy::invalidate()
   m_all_super_nodes_cached_height = 0;
   m_all_super_nodes.clear();
 
-  m_contributed_service_nodes_cached_height = 0;
-  m_contributed_service_nodes_cached_address.clear();
-  m_contributed_service_nodes.clear();
+  m_contributed_super_nodes_cached_height = 0;
+  m_contributed_super_nodes_cached_address.clear();
+  m_contributed_super_nodes.clear();
 
   m_height = 0;
   for (size_t n = 0; n < 256; ++n)
@@ -275,12 +275,12 @@ std::vector<cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::entry> NodeRPCPro
   return result;
 }
 
-// Updates the cache of all service nodes; the mutex lock must be already held
-bool NodeRPCProxy::update_all_service_nodes_cache(uint64_t height, boost::optional<std::string> &failed) const {
-  cryptonote::COMMAND_RPC_GET_SERVICE_NODES::request req = {};
-  cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response res = {};
+// Updates the cache of all super nodes; the mutex lock must be already held
+bool NodeRPCProxy::update_all_super_nodes_cache(uint64_t height, boost::optional<std::string> &failed) const {
+  cryptonote::COMMAND_RPC_GET_SUPER_NODES::request req = {};
+  cryptonote::COMMAND_RPC_GET_SUPER_NODES::response res = {};
 
-  bool r = epee::net_utils::invoke_http_json_rpc("/json_rpc", "get_all_service_nodes", req, res, m_http_client, rpc_timeout);
+  bool r = epee::net_utils::invoke_http_json_rpc("/json_rpc", "get_all_super_nodes", req, res, m_http_client, rpc_timeout);
 
   if (!r)
   {
@@ -300,13 +300,13 @@ bool NodeRPCProxy::update_all_service_nodes_cache(uint64_t height, boost::option
     return false;
   }
 
-  m_all_service_nodes_cached_height = height;
-  m_all_service_nodes = std::move(res.service_node_states);
+  m_all_super_nodes_cached_height = height;
+  m_all_super_nodes = std::move(res.super_node_states);
   return true;
 }
 
 
-std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry> NodeRPCProxy::get_all_service_nodes(boost::optional<std::string> &failed) const
+std::vector<cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::entry> NodeRPCProxy::get_all_super_nodes(boost::optional<std::string> &failed) const
 {
   std::vector<cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::entry> result;
 
@@ -317,10 +317,10 @@ std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry> NodeRPCP
 
   {
     boost::lock_guard<boost::mutex> lock(m_daemon_rpc_mutex);
-    if (m_all_service_nodes_cached_height != height && !update_all_service_nodes_cache(height, failed))
+    if (m_all_super_nodes_cached_height != height && !update_all_super_nodes_cache(height, failed))
       return result;
 
-    result = m_all_service_nodes;
+    result = m_all_super_nodes;
   }
 
   return result;
@@ -328,9 +328,9 @@ std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry> NodeRPCP
 
 // Filtered version of the above that caches the filtered result as long as used on the same
 // contributor at the same height (which is very common, for example, for wallet balance lookups).
-std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry> NodeRPCProxy::get_contributed_service_nodes(const std::string &contributor, boost::optional<std::string> &failed) const
+std::vector<cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::entry> NodeRPCProxy::get_contributed_super_nodes(const std::string &contributor, boost::optional<std::string> &failed) const
 {
-  std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry> result;
+  std::vector<cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::entry> result;
 
   uint64_t height;
   failed = get_height(height);
@@ -339,24 +339,24 @@ std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry> NodeRPCP
 
   {
     boost::lock_guard<boost::mutex> lock(m_daemon_rpc_mutex);
-    if (m_contributed_service_nodes_cached_height != height || m_contributed_service_nodes_cached_address != contributor) {
+    if (m_contributed_super_nodes_cached_height != height || m_contributed_super_nodes_cached_address != contributor) {
 
-      if (m_all_service_nodes_cached_height != height && !update_all_service_nodes_cache(height, failed))
+      if (m_all_super_nodes_cached_height != height && !update_all_super_nodes_cache(height, failed))
         return result;
 
-      m_contributed_service_nodes.clear();
-      std::copy_if(m_all_service_nodes.begin(), m_all_service_nodes.end(), std::back_inserter(m_contributed_service_nodes),
-          [&contributor](const cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry &e)
+      m_contributed_super_nodes.clear();
+      std::copy_if(m_all_super_nodes.begin(), m_all_super_nodes.end(), std::back_inserter(m_contributed_super_nodes),
+          [&contributor](const cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::entry &e)
           {
             return std::any_of(e.contributors.begin(), e.contributors.end(),
-                [&contributor](const cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::contributor &c) { return contributor == c.address; });
+                [&contributor](const cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::contributor &c) { return contributor == c.address; });
           }
       );
-      m_contributed_service_nodes_cached_height = height;
-      m_contributed_service_nodes_cached_address = contributor;
+      m_contributed_super_nodes_cached_height = height;
+      m_contributed_super_nodes_cached_address = contributor;
     }
 
-    result = m_contributed_service_nodes;
+    result = m_contributed_super_nodes;
   }
 
   return result;

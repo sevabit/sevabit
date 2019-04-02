@@ -2232,7 +2232,7 @@ static void append_printable_super_node_list_entry(cryptonote::network_type nett
     buffer.append("\n");
   }
 
-  if (is_registered) // Print service node tests
+  if (is_registered) // Print super node tests
   {
     epee::console_colors uptime_proof_color = (entry.last_uptime_proof == 0) ? epee::console_color_red : epee::console_color_green;
 

@@ -5621,14 +5621,14 @@ bool wallet2::is_transfer_unlocked(uint64_t unlock_time, uint64_t block_height, 
   {
     const std::string primary_address = get_address_as_str();
     boost::optional<std::string> failed;
-    std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry> service_nodes_states = m_node_rpc_proxy.get_contributed_service_nodes(primary_address, failed);
+    std::vector<cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::entry> super_nodes_states = m_node_rpc_proxy.get_contributed_super_nodes(primary_address, failed);
     if (failed)
     {
       LOG_PRINT_L1("Failed to query super node for locked transfers, assuming transfer not locked, reason: " << *failed);
       return true;
     }
 
-    for (cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry const &entry : service_nodes_states)
+    for (cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::entry const &entry : super_nodes_states)
     {
       for (cryptonote::COMMAND_RPC_GET_SUPER_NODES::response::contributor const &contributor : entry.contributors)
       {
@@ -7316,8 +7316,8 @@ wallet2::stake_result wallet2::create_stake_tx(const crypto::public_key& super_n
 wallet2::register_super_node_result wallet2::create_register_super_node_tx(const std::vector<std::string> &args_, uint32_t subaddr_account)
 {
   std::vector<std::string> local_args = args_;
-  register_service_node_result result = {};
-  result.status                       = register_service_node_result_status::invalid;
+  register_super_node_result result = {};
+  result.status                       = register_super_node_result_status::invalid;
 
   //
   // Parse Tx Args
@@ -7357,7 +7357,7 @@ wallet2::register_super_node_result wallet2::create_register_super_node_tx(const
   boost::optional<uint8_t> hf_version = get_hard_fork_version();
   if (!hf_version)
   {
-    result.status = register_service_node_result_status::network_version_query_failed;
+    result.status = register_super_node_result_status::network_version_query_failed;
     result.msg    = ERR_MSG_NETWORK_VERSION_QUERY_FAILED;
     return result;
   }
@@ -7385,7 +7385,7 @@ wallet2::register_super_node_result wallet2::create_register_super_node_tx(const
       }
     }
 
-    staking_requirement = service_nodes::get_staking_requirement(nettype(), bc_height, *hf_version);
+    staking_requirement = super_nodes::get_staking_requirement(nettype(), bc_height, *hf_version);
     std::vector<std::string> const registration_args(local_args.begin(), local_args.begin() + local_args.size() - 3);
     converted_args = super_nodes::convert_registration_args(nettype(), registration_args, staking_requirement, *hf_version);
 
@@ -7560,7 +7560,7 @@ wallet2::register_super_node_result wallet2::create_register_super_node_tx(const
     }
   }
 
-  assert(result.status != register_service_node_result_status::invalid);
+  assert(result.status != register_super_node_result_status::invalid);
   return result;
 }
 

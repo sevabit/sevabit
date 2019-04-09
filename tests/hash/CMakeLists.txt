@@ -43,7 +43,7 @@ set_property(TARGET hash-tests
   PROPERTY
     FOLDER "tests")
 
-foreach (hash IN ITEMS fast tree extra-blake extra-groestl extra-jh extra-skein heavy-v1 heavy-v2 turtle-light-v2)
+foreach (hash IN ITEMS fast tree extra-blake extra-groestl extra-jh extra-skein heavy-v1 heavy-v2)
   add_test(
     NAME    "hash-${hash}"
     COMMAND hash-tests "${hash}" "${CMAKE_CURRENT_SOURCE_DIR}/tests-${hash}.txt")

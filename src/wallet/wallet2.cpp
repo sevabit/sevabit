@@ -1,5 +1,5 @@
 // Copyright (c) 2014-2018, The Monero Project
-// Copyright (c)      2018, The Loki Project
+// Copyright (c)      2018, The Sevabit Project
 // 
 // All rights reserved.
 // 
@@ -79,8 +79,8 @@ using namespace std;
 using namespace crypto;
 using namespace cryptonote;
 
-#undef LOKI_DEFAULT_LOG_CATEGORY
-#define LOKI_DEFAULT_LOG_CATEGORY "wallet.wallet2"
+#undef SEVABIT_DEFAULT_LOG_CATEGORY
+#define SEVABIT_DEFAULT_LOG_CATEGORY "wallet.wallet2"
 
 // used to choose when to stop adding outputs to a tx
 #define APPROXIMATE_INPUT_BYTES 80
@@ -91,9 +91,9 @@ using namespace cryptonote;
 // arbitrary, used to generate different hashes from the same input
 #define CHACHA8_KEY_TAIL 0x8c
 
-#define UNSIGNED_TX_PREFIX "Loki unsigned tx set\004"
-#define SIGNED_TX_PREFIX "Loki signed tx set\004"
-#define MULTISIG_UNSIGNED_TX_PREFIX "Loki multisig unsigned tx set\001"
+#define UNSIGNED_TX_PREFIX "Sevabit unsigned tx set\004"
+#define SIGNED_TX_PREFIX "Sevabit signed tx set\004"
+#define MULTISIG_UNSIGNED_TX_PREFIX "Sevabit multisig unsigned tx set\001"
 
 #define RECENT_OUTPUT_RATIO (0.5) // 50% of outputs are from the recent zone
 #define RECENT_OUTPUT_DAYS (1.8) // last 1.8 day makes up the recent zone (taken from monerolink.pdf, Miller et al)
@@ -107,9 +107,9 @@ using namespace cryptonote;
 #define SUBADDRESS_LOOKAHEAD_MAJOR 50
 #define SUBADDRESS_LOOKAHEAD_MINOR 200
 
-#define KEY_IMAGE_EXPORT_FILE_MAGIC "Loki key image export\002"
+#define KEY_IMAGE_EXPORT_FILE_MAGIC "Sevabit key image export\002"
 
-#define MULTISIG_EXPORT_FILE_MAGIC "Loki multisig export\001"
+#define MULTISIG_EXPORT_FILE_MAGIC "Sevabit multisig export\001"
 
 #define SEGREGATION_FORK_HEIGHT 1546000
 #define TESTNET_SEGREGATION_FORK_HEIGHT 1000000
@@ -122,7 +122,7 @@ namespace
   std::string get_default_ringdb_path()
   {
     boost::filesystem::path dir = tools::get_default_data_dir();
-    // remove .loki, replace with .shared-ringdb
+    // remove .sevabit, replace with .shared-ringdb
     dir = dir.remove_filename();
     dir /= ".shared-ringdb";
     return dir.string();
@@ -5350,7 +5350,7 @@ int wallet2::get_fee_algorithm() const
 uint64_t wallet2::adjust_mixin(uint64_t mixin) const
 {
   if (mixin != 9) {
-    MWARNING("Requested ring size " << (mixin + 1) << " incorrect for loki, using 10");
+    MWARNING("Requested ring size " << (mixin + 1) << " incorrect for sevabit, using 10");
     mixin = 9;
   }
   return mixin;
@@ -10174,7 +10174,7 @@ std::string wallet2::make_uri(const std::string &address, const std::string &pay
     }
   }
 
-  std::string uri = "loki:" + address;
+  std::string uri = "sevabit:" + address;
   unsigned int n_fields = 0;
 
   if (!payment_id.empty())
@@ -10203,9 +10203,9 @@ std::string wallet2::make_uri(const std::string &address, const std::string &pay
 //----------------------------------------------------------------------------------------------------
 bool wallet2::parse_uri(const std::string &uri, std::string &address, std::string &payment_id, uint64_t &amount, std::string &tx_description, std::string &recipient_name, std::vector<std::string> &unknown_parameters, std::string &error)
 {
-  if (uri.substr(0, 5) != "loki:")
+  if (uri.substr(0, 5) != "sevabit:")
   {
-    error = std::string("URI has wrong scheme (expected \"loki:\"): ") + uri;
+    error = std::string("URI has wrong scheme (expected \"sevabit:\"): ") + uri;
     return false;
   }
 

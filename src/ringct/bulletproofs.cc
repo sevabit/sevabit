@@ -40,8 +40,8 @@ extern "C"
 #include "rctOps.h"
 #include "bulletproofs.h"
 
-#undef LOKI_DEFAULT_LOG_CATEGORY
-#define LOKI_DEFAULT_LOG_CATEGORY "bulletproofs"
+#undef SEVABIT_DEFAULT_LOG_CATEGORY
+#define SEVABIT_DEFAULT_LOG_CATEGORY "bulletproofs"
 
 //#define DEBUG_BP
 

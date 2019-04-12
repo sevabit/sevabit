@@ -1,4 +1,4 @@
-# Copyright (c) 2018, The Loki Project
+# Copyright (c) 2018, The Sevabit Project
 # Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
@@ -42,7 +42,7 @@ endif()
 
 cmake_minimum_required(VERSION 2.8.7)
 
-project(loki)
+project(sevabit)
 
 function (die msg)
   if (NOT WIN32)

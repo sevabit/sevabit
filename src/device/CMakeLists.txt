@@ -1,4 +1,4 @@
-# Copyright (c) 2018, The Loki Project
+# Copyright (c) 2018, The Sevabit Project
 # Copyright (c) 2014-2017, The Monero Project
 #
 # All rights reserved.
@@ -56,10 +56,10 @@ else()
   set(Blocks "")
 endif()
 
-loki_private_headers(device
+sevabit_private_headers(device
   ${device_private_headers})
 
-loki_add_library(device
+sevabit_add_library(device
   ${device_sources}
   ${device_headers}
   ${device_private_headers})

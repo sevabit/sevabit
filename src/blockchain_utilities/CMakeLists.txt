@@ -1,4 +1,4 @@
-# Copyright (c) 2018, The Loki Project
+# Copyright (c) 2018, The Sevabit Project
 # Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
@@ -49,7 +49,7 @@ set(blockchain_import_private_headers
   bootstrap_serialization.h
   )
 
-loki_private_headers(blockchain_import
+sevabit_private_headers(blockchain_import
 	  ${blockchain_import_private_headers})
 
 set(blockchain_export_sources
@@ -64,7 +64,7 @@ set(blockchain_export_private_headers
   bootstrap_serialization.h
   )
 
-loki_private_headers(blockchain_export
+sevabit_private_headers(blockchain_export
 	  ${blockchain_export_private_headers})
 
 
@@ -78,7 +78,7 @@ set(blockchain_blackball_private_headers
   bootstrap_serialization.h
   )
 
-loki_private_headers(blockchain_blackball
+sevabit_private_headers(blockchain_blackball
 	  ${blockchain_blackball_private_headers})
 
 set(blockchain_usage_sources
@@ -87,12 +87,12 @@ set(blockchain_usage_sources
 
 set(blockchain_usage_private_headers)
 
-loki_private_headers(blockchain_usage
+sevabit_private_headers(blockchain_usage
 	  ${blockchain_usage_private_headers})
 
 
 
-loki_add_executable(blockchain_import
+sevabit_add_executable(blockchain_import
   ${blockchain_import_sources}
   ${blockchain_import_private_headers}
   ${blocksdat})
@@ -117,10 +117,10 @@ endif()
 
 set_property(TARGET blockchain_import
 	PROPERTY
-	OUTPUT_NAME "loki-blockchain-import")
+	OUTPUT_NAME "sevabit-blockchain-import")
 install(TARGETS blockchain_import DESTINATION bin)
 
-loki_add_executable(blockchain_export
+sevabit_add_executable(blockchain_export
   ${blockchain_export_sources}
   ${blockchain_export_private_headers})
 
@@ -139,10 +139,10 @@ target_link_libraries(blockchain_export
 
 set_property(TARGET blockchain_export
 	PROPERTY
-	OUTPUT_NAME "loki-blockchain-export")
+	OUTPUT_NAME "sevabit-blockchain-export")
 install(TARGETS blockchain_export DESTINATION bin)
 
-loki_add_executable(blockchain_blackball
+sevabit_add_executable(blockchain_blackball
   ${blockchain_blackball_sources}
   ${blockchain_blackball_private_headers})
 
@@ -162,11 +162,11 @@ target_link_libraries(blockchain_blackball
 
 set_property(TARGET blockchain_blackball
 	PROPERTY
-	OUTPUT_NAME "loki-blockchain-blackball")
+	OUTPUT_NAME "sevabit-blockchain-blackball")
 install(TARGETS blockchain_blackball DESTINATION bin)
 
 
-loki_add_executable(blockchain_usage
+sevabit_add_executable(blockchain_usage
   ${blockchain_usage_sources}
   ${blockchain_usage_private_headers})
 
@@ -185,6 +185,6 @@ target_link_libraries(blockchain_usage
 
 set_property(TARGET blockchain_usage
 	PROPERTY
-	OUTPUT_NAME "loki-blockchain-usage")
+	OUTPUT_NAME "sevabit-blockchain-usage")
 install(TARGETS blockchain_usage DESTINATION bin)
 

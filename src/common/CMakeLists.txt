@@ -1,4 +1,4 @@
-# Copyright (c) 2018, The Loki Project
+# Copyright (c) 2018, The Sevabit Project
 # Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
@@ -70,9 +70,9 @@ set(common_private_headers
   threadpool.h
   updates.h)
 
-loki_private_headers(common
+sevabit_private_headers(common
   ${common_private_headers})
-loki_add_library(common
+sevabit_add_library(common
   ${common_sources}
   ${common_headers}
   ${common_private_headers}

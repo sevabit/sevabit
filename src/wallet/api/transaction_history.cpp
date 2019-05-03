@@ -94,8 +94,7 @@ std::vector<TransactionInfo *> TransactionHistoryImpl::getAll() const
 
 static reward_type from_pay_type(tools::pay_type ptype) {
     switch (ptype) {
-        case tools::pay_type::governance: return reward_type::governance;
-		case tools::pay_type::super_node: return reward_type::super_node;
+	case tools::pay_type::super_node: return reward_type::super_node;
         case tools::pay_type::miner: return reward_type::miner;
         default: return reward_type::unspecified;
     }

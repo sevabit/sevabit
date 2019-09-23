@@ -1,5 +1,5 @@
 # Copyright (c) 2018, The Sevabit Project
-# Copyright (c) 2014-2018, The Monero Project
+# Copyright (c) 2014-2019, The Monero Project
 #
 # All rights reserved.
 #
@@ -40,6 +40,7 @@ set(crypto_sources
   hash-extra-jh.c
   hash-extra-skein.c
   hash.c
+  hmac-keccak.c
   jh.c
   keccak.c
   oaes_lib.c
@@ -49,8 +50,12 @@ set(crypto_sources
   cn_heavy_hash_hard_intel.cpp
   cn_heavy_hash_soft.cpp
   cn_conceal.cpp
+  rx-slow-hash.c
   tree-hash.c
   aux_hash.c)
+
+
+include_directories(${RANDOMX_INCLUDE})
 
 set(crypto_headers)
 
@@ -64,6 +69,7 @@ set(crypto_private_headers
   groestl_tables.h
   hash-ops.h
   hash.h
+  hmac-keccak.h
   initializer.h
   jh.h
   keccak.h
@@ -87,6 +93,7 @@ sevabit_add_library(cncrypto
 target_link_libraries(cncrypto
   PUBLIC
     epee
+    randomx
     ${Boost_SYSTEM_LIBRARY}
     ${SODIUM_LIBRARY}
   PRIVATE

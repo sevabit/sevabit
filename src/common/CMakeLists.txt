@@ -1,5 +1,5 @@
 # Copyright (c) 2018, The Sevabit Project
-# Copyright (c) 2014-2018, The Monero Project
+# Copyright (c) 2014-2019, The Monero Project
 #
 # All rights reserved.
 #
@@ -36,7 +36,7 @@ set(common_sources
   download.cpp
   error.cpp
   expect.cpp
-  loki.cpp
+  sevabit.cpp
   util.cpp
   i18n.cpp
   rules.cpp
@@ -49,6 +49,7 @@ set(common_sources
   threadpool.cpp
   updates.cpp
   aligned.c
+  timings.cc
   combinator.cpp)
 
 if (STACK_TRACE)
@@ -71,9 +72,9 @@ set(common_private_headers
   download.h
   error.h
   expect.h
-  loki.h
+  sevabit.h
   http_connection.h
-  loki_integration_test_hooks.h
+  sevabit_integration_test_hooks.h
   notify.h
   pod-class.h
   pruning.h
@@ -91,6 +92,7 @@ set(common_private_headers
   threadpool.h
   updates.h
   aligned.h
+  timings.h
   combinator.h)
 
 sevabit_private_headers(common

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2014-2019, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -39,7 +39,7 @@
   #define PAUSE_READLINE()
 #endif
 
-#include "common/loki_integration_test_hooks.h"
+#include "common/sevabit_integration_test_hooks.h"
 
 namespace tools
 {
